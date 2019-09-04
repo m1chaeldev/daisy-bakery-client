@@ -1,15 +1,3 @@
-export function exampleTanglen() {
-  return dispatch => {
-    dispatch({
-      type: "TANG_LEN"
-    });
-  };
-}
+import { action } from './../../utils/action';
 
-export function exampleGiamxuong() {
-  return dispatch => {
-    dispatch({
-      type: "GIAM_XUONG"
-    });
-  };
-}
+export const exampleTanglen = action("TANG_LEN");
