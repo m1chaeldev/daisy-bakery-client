@@ -1,0 +1,10 @@
+.hoverBtn:hover {
+    border-width: 1px !important;
+    transition: 0.2s all linear !important;
+    border-color: #e85a4f !important;
+}
+
+.hoverBtn:hover .hoverText {
+    color: #e85a4f !important;
+    transition: 0.2s all linear !important;
+}

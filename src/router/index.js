@@ -1,5 +1,6 @@
 import React, { PureComponent } from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { createBrowserHistory } from 'history'
 
 // import AuthorizedRoute from '../components/Authorized'
 import Home from "../views/pages/Home/Container";
@@ -8,7 +9,7 @@ import NotFound from "../views/pages/NotFound/Container";
 class RouterConfig extends PureComponent {
   render() {
     return (
-      <BrowserRouter>
+      <BrowserRouter history={createBrowserHistory}>
         <Switch>
             <Route exact path="/" component={Home} />
             <Route exact path="/home" component={Home} />

@@ -6,6 +6,8 @@ import Router from "./router";
 // Ant Design
 import 'antd/dist/antd.css';
 
+import './global.css';
+
 // Redux
 import { Provider } from 'react-redux'
 import store from './store';

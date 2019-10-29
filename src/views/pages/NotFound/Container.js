@@ -1,34 +1,36 @@
 import React, { Component, Fragment } from "react";
+import { withRouter } from 'react-router-dom';
 // Style
 // import styles from "./styles";
 // Redux
 import { connect } from "react-redux";
 // Component
-import NotFound from "./Component";
+import ComponentPage from "./Component";
 // Action
-// import { examActions } from "../../../redux/actions"
+import { examActions } from "../../../redux/actions"
 
-class NotFoundContainer extends Component {
+class ContainerPage extends Component {
   render() {
     return (
       <Fragment>
-        <NotFound />
+        <ComponentPage {...this.props} />
       </Fragment>
     );
   }
 }
 
 const mapActionToProps = {
-  // getTagsAction,
+  Tanglen: examActions.exampleTanglen,
+  Giamxuong: examActions.exampleGiamxuong
 };
 
 const mapStateToProps = state => {
   return {
-    // tagData: state.tag,
+    data: state.exam.count,
   };
 };
 
 export default connect(
   mapStateToProps,
   mapActionToProps
-)(NotFoundContainer);
+)(withRouter(ContainerPage));

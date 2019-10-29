@@ -1,18 +1,19 @@
 import React, { Component, Fragment } from "react";
+import { withRouter } from 'react-router-dom';
 // Style
 // import styles from "./styles";
 // Redux
 import { connect } from "react-redux";
 // Component
-import HomePage from "./Component";
+import ComponentPage from "./Component";
 // Action
 import { examActions } from "../../../redux/actions"
 
-class HomePageContainer extends Component {
+class ContainerPage extends Component {
   render() {
     return (
       <Fragment>
-        <HomePage {...this.props} />
+        <ComponentPage {...this.props} />
       </Fragment>
     );
   }
@@ -32,4 +33,4 @@ const mapStateToProps = state => {
 export default connect(
   mapStateToProps,
   mapActionToProps
-)(HomePageContainer);
+)(withRouter(ContainerPage));
