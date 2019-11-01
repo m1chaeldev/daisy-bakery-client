@@ -14,9 +14,10 @@ class ComponentPage extends Component {
     }
 
     render() {
+        const { bgColor } = this.props;
         return (
             <Row>
-                <Col span={24} style={styles.background}>
+                <Col span={24} style={{ ...styles.background, backgroundColor: bgColor ? bgColor : '#eae7dc' }}>
                     <img
                         src={logoImg}
                         alt="Daisy bakery"

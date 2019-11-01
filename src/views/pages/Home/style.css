@@ -1,10 +1,9 @@
-.hoverBtn:hover {
-    border-width: 1px !important;
-    transition: 0.2s all linear !important;
-    border-color: #e85a4f !important;
+.EachBakery:hover {
+    border: solid 1px black !important;
+    transition: border 0.3s ease-in-out;
 }
 
-.hoverBtn:hover .hoverText {
-    color: #e85a4f !important;
-    transition: 0.2s all linear !important;
+.developerIcon:hover {
+    filter: invert(38%) sepia(81%) saturate(902%) hue-rotate(326deg) brightness(99%) contrast(84%) !important;
+    transition: 0.3s all linear !important;
 }
