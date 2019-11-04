@@ -17,7 +17,7 @@ const slideImages = [
     },
     {
         name: 'Quảng cáo 3',
-        image: 'https://www.weightwatchersshop.co.uk/media/simpleslider/30-minute-meals-ecommerce-banner-cropped-1920x450.jpg'
+        image: 'https://lifelabtesting.com/wp-content/uploads/2018/12/Almond-Milk-Banner-1920x450.jpg'
     }
 ];
 

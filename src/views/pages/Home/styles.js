@@ -45,7 +45,8 @@ const styles = {
     },
     hMenuSmallText: {
         color: '#000',
-        fontSize: '0.7rem'
+        fontSize: '0.9rem',
+        fontFamily: 'Open Sans, sans-serif'
     },
     contentHeaderMenuWrapper: {
         backgroundColor: '#d8c3a5',
@@ -119,7 +120,8 @@ const styles = {
         color: '#e85a4f',
         fontSize: '1.1rem',
         fontWeight: 'bold',
-        textTransform: 'uppercase'
+        textTransform: 'uppercase',
+        fontFamily: 'Open Sans, sans-serif'
     },
     eachCategory: {
         marginTop: 20,
@@ -136,6 +138,19 @@ const styles = {
         alignItems: 'center',
         justifyContent: 'center'
     },
+    newBakeryWrapper: {
+        position: 'absolute',
+        top: 10,
+        left: 0,
+        width: 100,
+        paddingTop: 5,
+        paddingBottom: 5,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'rgba(234, 231, 220, 0.9)',
+        borderRight: 'solid 3px #e85a4f'
+    },
     outOfBakeryWrapper: {
         paddingLeft: 30,
         paddingRight: 30,
@@ -151,12 +166,29 @@ const styles = {
     outOfBakeryText: {
         color: '#e85a4f',
         fontSize: '0.8rem',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        fontFamily: 'Open Sans, sans-serif'
     },
     bakeryName: {
         fontWeight: 'bold',
         fontSize: '1rem',
-        color: 'black'
+        color: 'black',
+        fontFamily: 'Montserrat, sans-serif'
+    },
+    showMoreWrapper: {
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'flex-end',
+        alignItems: 'center'
+    },
+    showMoreText: {
+        fontSize: '1rem',
+        color: 'black',
+        fontFamily: 'Montserrat, sans-serif',
+        fontWeight: 100,
+        textAlign: 'right',
+        cursor: 'pointer',
+        marginTop: 20
     },
     bakeryCode: {
         fontSize: '0.8rem',
@@ -166,7 +198,8 @@ const styles = {
     bakeryPrice: {
         fontWeight: 'bold',
         fontSize: '1rem',
-        color: 'black'
+        color: 'black',
+        fontFamily: 'Open Sans, sans-serif'
     },
     bakeryImageWrapper: {
         width: '100%',
@@ -187,74 +220,6 @@ const styles = {
         bottom: 5,
         cursor: 'pointer',
         filter: 'invert(38%) sepia(81%) saturate(902%) hue-rotate(326deg) brightness(99%) contrast(84%)', // Đỏ
-    },
-    footerWrapper: {
-        position: 'relative'
-    },
-    footerCover: {
-        width: '100%',
-        height: '100%',
-        backgroundColor: 'rgba(0, 0, 0, 0.7)',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        padding: 20
-    },
-    developerWrapper: {
-        width: '100%',
-        height: 50,
-        backgroundColor: '#444',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    noCopyrightText: {
-        color: '#aaa',
-        fontSize: '0.8rem'
-    },
-    developer: {
-        color: 'white',
-        fontSize: '0.8rem',
-        fontWeight: 'bold',
-        marginLeft: 3
-    },
-    developerIcon: {
-        width: 24,
-        height: 24,
-        cursor: 'pointer',
-        filter: 'invert(50%) sepia(0%) saturate(28%) hue-rotate(152deg) brightness(92%) contrast(81%)'
-    },
-    developerIconWrapper: {
-        marginLeft: 20
-    },
-    footerText: {
-        color: 'white',
-        fontSize: '0.8rem'
-    },
-    logoImg: {
-        filter: 'invert(38%) sepia(81%) saturate(902%) hue-rotate(326deg) brightness(99%) contrast(84%)', // Đỏ
-        height: '90%',
-        maxHeight: 100
-    },
-    footerContentWrapper: {
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    footerIcon: {
-        width: 24
-    },
-    daisyInfo: {
-        display: 'flex',
-        alignItems: 'center',
-        cursor: 'pointer'
-    },
-    iconWrapper: {
-        width: 40,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
     }
 };
 
