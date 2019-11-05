@@ -48,26 +48,6 @@ const styles = {
         fontSize: '0.9rem',
         fontFamily: 'Open Sans, sans-serif'
     },
-    cartTitleText: {
-        color: '#000',
-        fontSize: '0.7rem',
-        fontWeight: 'bold',
-        fontFamily: 'Open Sans, sans-serif'
-    },
-    cartAmountText: {
-        color: '#000',
-        fontSize: '0.7rem',
-        fontFamily: 'Open Sans, sans-serif',
-        marginLeft: 5,
-        marginRight: 5
-    },
-    eachCartItemWrapper: {
-        width: '100%',
-        borderBottom: 'solid 1px #d9d9d9',
-        paddingTop: 5,
-        paddingBottom: 5,
-        display: 'flex'
-    },
     contentHeaderMenuWrapper: {
         backgroundColor: '#d8c3a5',
         border: 'solid 2px #e85a4f',
@@ -182,18 +162,6 @@ const styles = {
         justifyContent: 'center',
         backgroundColor: 'rgba(234, 231, 220, 0.9)',
         borderRight: 'solid 3px #e85a4f'
-    },
-    deleteWrapper: {
-        position: 'absolute',
-        left: 0,
-        top: 0,
-        width: 20,
-        height: 20,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        cursor: 'pointer'
     },
     outOfBakeryWrapper: {
         paddingLeft: 30,

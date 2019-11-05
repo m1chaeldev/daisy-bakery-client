@@ -1,0 +1,9 @@
+.EachBakery:hover {
+    border: solid 1px black !important;
+    transition: border 0.3s ease-in-out;
+}
+
+.developerIcon:hover {
+    filter: invert(38%) sepia(81%) saturate(902%) hue-rotate(326deg) brightness(99%) contrast(84%) !important;
+    transition: 0.3s all linear !important;
+}
