@@ -264,6 +264,31 @@ const styles = {
         bottom: 5,
         cursor: 'pointer',
         filter: 'invert(38%) sepia(81%) saturate(902%) hue-rotate(326deg) brightness(99%) contrast(84%)', // Đỏ
+    },
+    facebookLoginBtn: {
+        width: '100%',
+        height: 30,
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        border: 'none',
+        outline: 'none',
+        backgroundColor: 'transparent'
+    },
+    facebookLoginIcon: {
+        width: 24,
+        height: 24,
+        marginRight: 10
+    },
+    facebookLoginText: {
+        color: 'black',
+        fontSize: '0.9rem'
+    },
+    userPopoverIcon: {
+        width: 12,
+        height: 12,
+        marginRight: 5
     }
 };
 

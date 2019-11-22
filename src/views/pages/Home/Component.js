@@ -3,7 +3,7 @@ import { Input, Empty, Col, message, Popover, Dropdown, Button, Icon, Menu } fro
 import Header from './../../commons/components/Header';
 import Slider from './../../commons/components/Slider';
 import Footer from './../../commons/components/Footer';
-import LoadingIcon from './../../commons/components/LoadingIcon';
+// import LoadingIcon from './../../commons/components/LoadingIcon';
 import ListCakes from './../../commons/components/ListCakes';
 
 // Styles
@@ -19,6 +19,8 @@ const shopGmail = 'example@gmail.com';
 const shopAddress = '24/212 Tran Quang Khai, TP. Nha Trang';
 const shopPhone = '0349445935';
 
+const facebookIcon = require('./../../commons/images/icons/facebook.png');
+const rightArrowIcon = require('./../../commons/images/icons/right-arrow.png');
 const pinIcon = require('./../../commons/images/icons/pin.png');
 const phoneIcon = require('./../../commons/images/icons/phone.png');
 const gmailIcon = require('./../../commons/images/icons/gmail.png');
@@ -55,10 +57,41 @@ const bakeryData = [
         cake_price: '36500',
         cake_startedDate: new Date(2019, 9, 24),
         is_out_stock: true
-    }, {
+    },
+    {
         id: '4',
         cake_image: require('./../../commons/images/bakery3.jpg'),
         cake_name: 'Bánh mì Def',
+        cake_category: 'Bánh mì 2',
+        cake_code: 'SW168',
+        cake_price: '50000',
+        cake_startedDate: new Date(2019, 10, 3),
+        is_out_stock: false
+    },
+    {
+        id: '5',
+        cake_image: require('./../../commons/images/bakery3.jpg'),
+        cake_name: 'Bánh mì Def 1',
+        cake_category: 'Bánh mì 2',
+        cake_code: 'SW168',
+        cake_price: '50000',
+        cake_startedDate: new Date(2019, 10, 3),
+        is_out_stock: false
+    },
+    {
+        id: '6',
+        cake_image: require('./../../commons/images/bakery3.jpg'),
+        cake_name: 'Bánh mì Def 2',
+        cake_category: 'Bánh mì 2',
+        cake_code: 'SW168',
+        cake_price: '50000',
+        cake_startedDate: new Date(2019, 10, 3),
+        is_out_stock: false
+    },
+    {
+        id: '7',
+        cake_image: require('./../../commons/images/bakery3.jpg'),
+        cake_name: 'Bánh mì Def 3',
         cake_category: 'Bánh mì 2',
         cake_code: 'SW168',
         cake_price: '50000',
@@ -129,6 +162,21 @@ const hMenu = [
     }
 ];
 
+const userPopoverOptions = [
+    {
+        title: 'Thông tin tài khoản',
+        path: 'user-information'
+    },
+    {
+        title: 'Lịch sử',
+        path: 'history'
+    },
+    {
+        title: 'Đăng xuất',
+        path: 'logout'
+    }
+];
+
 function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
@@ -139,7 +187,8 @@ class ComponentPage extends Component {
         this.state = {
             cart: [],
             user: {
-                role: 'Admin'
+                role: 'Admin',
+                name: 'Thái Nguyễn'
             },
             categorySelected: {
                 banhMi: '',
@@ -205,10 +254,6 @@ class ComponentPage extends Component {
         message.success(item.cake_name);
     };
 
-    userPopover = () => (
-        <div style={{ width: 250 }}>User</div>
-    );
-
     updateCartAmount = (item, value) => {
         const { cart } = this.state;
         const index = cart.findIndex(obj => obj.cake_name === item.cake_name);
@@ -231,10 +276,50 @@ class ComponentPage extends Component {
         }
     };
 
+    handleClickOptionUserPopover = (path) => {
+        const { history } = this.props;
+        if (path === 'logout') alert('Logout')
+        else history.push(path);
+    };
+
+    userPopover = () => {
+        const { user } = this.state;
+        return (
+            <div style={{ width: 250 }}>
+                {user.name === '' ? (
+                    <button style={styles.facebookLoginBtn}>
+                        <img
+                            src={facebookIcon}
+                            alt=""
+                            style={styles.facebookLoginIcon}
+                        />
+                        <div style={styles.facebookLoginText}>Đăng nhập facebook</div>
+                    </button>
+                ) : (
+                        <div style={{ width: '100%' }}>
+                            {userPopoverOptions.map((item, index) => (
+                                <button
+                                    style={styles.facebookLoginBtn}
+                                    onClick={() => this.handleClickOptionUserPopover(item.path)}
+                                >
+                                    <img
+                                        src={rightArrowIcon}
+                                        alt=""
+                                        style={styles.userPopoverIcon}
+                                    />
+                                    {item.title}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+            </div>
+        );
+    };
+
     cartPopover = () => {
         const { cart } = this.state;
         return (
-            <div style={{ width: 250 }}>
+            <div style={{ width: 250, maxHeight: 300, overflowY: 'auto', overflowX: 'hidden' }}>
                 {cart.length <= 0 ?
                     <Empty description="Không có bánh trong giỏ hàng" /> :
                     <div>
@@ -474,6 +559,7 @@ class ComponentPage extends Component {
                             content={this.userPopover()}
                             trigger="click"
                             placement="bottomRight"
+                            title={user.name === '' ? 'Vui lòng đăng nhập' : `Chào ${user.name}`}
                         >
                             <img
                                 alt=""
@@ -516,7 +602,7 @@ class ComponentPage extends Component {
                                             <Button
                                                 icon="plus"
                                                 loading={false}
-                                                onClick={null}
+                                                onClick={() => alert(category.name)}
                                             >
                                                 <span style={{ fontFamily: 'Montserrat, sans-serif' }}>Thêm bánh</span>
                                             </Button>
@@ -530,6 +616,7 @@ class ComponentPage extends Component {
                                         handleClickBuyBakery={this.handleClickBuyBakery}
                                         handleClickEdit={this.handleClickEdit}
                                         isNewCake={this.isNewCake}
+                                        // limit={3}
                                     />
                                     <div style={styles.showMoreWrapper}>
                                         <div
@@ -546,7 +633,7 @@ class ComponentPage extends Component {
                     </Col>
                 </div>
                 <Footer width={width} developerGoto={this.developerGoto} />
-            </div >
+            </div>
         );
     }
 };

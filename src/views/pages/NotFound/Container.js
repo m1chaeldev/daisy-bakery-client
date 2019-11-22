@@ -7,7 +7,7 @@ import { connect } from "react-redux";
 // Component
 import ComponentPage from "./Component";
 // Action
-import { examActions } from "../../../redux/actions"
+// import { examActions } from "../../../redux/actions"
 
 class ContainerPage extends Component {
   render() {
@@ -20,13 +20,12 @@ class ContainerPage extends Component {
 }
 
 const mapActionToProps = {
-  Tanglen: examActions.exampleTanglen,
-  Giamxuong: examActions.exampleGiamxuong
+  // Tanglen: examActions.exampleTanglen,
 };
 
 const mapStateToProps = state => {
   return {
-    data: state.exam.count,
+    // data: state.exam.count,
   };
 };
 
