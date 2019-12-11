@@ -48,6 +48,26 @@ const styles = {
         fontSize: '0.9rem',
         fontFamily: 'Open Sans, sans-serif'
     },
+    cartTitleText: {
+        color: '#000',
+        fontSize: '0.7rem',
+        fontWeight: 'bold',
+        fontFamily: 'Open Sans, sans-serif'
+    },
+    cartAmountText: {
+        color: '#000',
+        fontSize: '0.7rem',
+        fontFamily: 'Open Sans, sans-serif',
+        marginLeft: 5,
+        marginRight: 5
+    },
+    eachCartItemWrapper: {
+        width: '100%',
+        borderBottom: 'solid 1px #d9d9d9',
+        paddingTop: 5,
+        paddingBottom: 5,
+        display: 'flex'
+    },
     contentHeaderMenuWrapper: {
         backgroundColor: '#d8c3a5',
         border: 'solid 2px #e85a4f',
@@ -163,6 +183,18 @@ const styles = {
         backgroundColor: 'rgba(234, 231, 220, 0.9)',
         borderRight: 'solid 3px #e85a4f'
     },
+    deleteWrapper: {
+        position: 'absolute',
+        left: 0,
+        top: 0,
+        width: 20,
+        height: 20,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        cursor: 'pointer'
+    },
     outOfBakeryWrapper: {
         paddingLeft: 30,
         paddingRight: 30,
@@ -213,12 +245,6 @@ const styles = {
         color: 'black',
         fontFamily: 'Open Sans, sans-serif'
     },
-    bakeryPriceSaleOff: {
-        fontSize: '1rem',
-        fontFamily: 'Open Sans, sans-serif',
-        fontStyle: 'italic',
-        textDecoration: 'line-through'
-    },
     bakeryImageWrapper: {
         width: '100%',
         position: 'relative'
@@ -238,6 +264,52 @@ const styles = {
         bottom: 5,
         cursor: 'pointer',
         filter: 'invert(38%) sepia(81%) saturate(902%) hue-rotate(326deg) brightness(99%) contrast(84%)', // Đỏ
+    },
+    facebookLoginBtn: {
+        width: '100%',
+        height: 30,
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        border: 'none',
+        outline: 'none',
+        backgroundColor: 'transparent'
+    },
+    facebookLoginIcon: {
+        width: 24,
+        height: 24,
+        marginRight: 10
+    },
+    facebookLoginText: {
+        color: 'black',
+        fontSize: '0.9rem'
+    },
+    userPopoverIcon: {
+        width: 12,
+        height: 12,
+        marginRight: 5
+    },
+    paymentBtnWrapper: {
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        position: 'relative',
+        marginTop: 10
+    },
+    paymentBtn: {
+        border: 'none',
+        outline: 'none',
+        backgroundColor: 'rgb(232, 90, 79)',
+        height: 30,
+        paddingLeft: 30,
+        paddingRight: 30,
+        cursor: 'pointer'
+    },
+    paymentBtnText: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: '0.8rem'
     }
 };
 

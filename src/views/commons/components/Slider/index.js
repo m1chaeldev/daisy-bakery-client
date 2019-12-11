@@ -60,7 +60,7 @@ class ComponentPage extends Component {
                         ))}
                     </Slide>
                 </Col>
-            </Row >
+            </Row>
         );
     }
 };

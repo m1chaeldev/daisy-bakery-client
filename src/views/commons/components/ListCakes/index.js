@@ -18,6 +18,12 @@ class ComponentPage extends Component {
         }
     }
 
+    calcPercent = (percent, total) => {
+        let result = 0;
+        result = Number(percent) * Number(total) / 100;
+        return result.toFixed(0);
+    };
+
     render() {
         const { data, limit, handleClickBuyBakery, user, handleClickEdit, isNewCake } = this.props;
         const limitCakes = limit ? limit : 1000000;
@@ -66,7 +72,15 @@ class ComponentPage extends Component {
                         <div style={{ textAlign: 'center', marginTop: 10 }}>
                             <div style={styles.bakeryName}>{item.cake_name}</div>
                             <div style={styles.bakeryCode}># {item.cake_code}</div>
-                            <div style={styles.bakeryPrice}>VND {numberWithCommas(item.cake_price)}</div>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <div style={item.saleOff && Number(item.saleOff) > 0 ? styles.bakeryPriceSaleOff : styles.bakeryPrice}>{numberWithCommas(item.cake_price)}đ</div>
+                                {item.saleOff && Number(item.saleOff) > 0 && (
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                        <div style={{ ...styles.bakeryPrice, marginLeft: 10, marginRight: 5 }}>{numberWithCommas(Number(item.cake_price) - this.calcPercent(item.saleOff, item.cake_price))}đ</div>
+                                        <div style={{ ...styles.bakeryPrice, color: 'red', fontWeight: 'normal', fontStyle: 'italic' }}>-{item.saleOff}%</div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </Col>
                 ))}

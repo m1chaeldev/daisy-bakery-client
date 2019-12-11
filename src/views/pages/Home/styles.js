@@ -289,6 +289,26 @@ const styles = {
         width: 12,
         height: 12,
         marginRight: 5
+    },
+    paymentBtnWrapper: {
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'flex-end'
+    },
+    paymentBtn: {
+        marginTop: 10,
+        border: 'none',
+        outline: 'none',
+        backgroundColor: 'rgb(232, 90, 79)',
+        height: 30,
+        paddingLeft: 30,
+        paddingRight: 30,
+        cursor: 'pointer'
+    },
+    paymentBtnText: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: '0.8rem'
     }
 };
 

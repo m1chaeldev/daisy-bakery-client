@@ -1,31 +1,26 @@
 import React, { Component } from 'react';
-import { Input, Empty, Col, message, Popover, Dropdown, Button, Icon, Menu } from 'antd';
+import { Col, message, Dropdown, Button, Icon, Menu, Modal, Input, Upload, Select } from 'antd';
 import Header from './../../commons/components/Header';
 import Slider from './../../commons/components/Slider';
 import Footer from './../../commons/components/Footer';
 // import LoadingIcon from './../../commons/components/LoadingIcon';
 import ListCakes from './../../commons/components/ListCakes';
+import CartAndUser from './../../commons/components/CartAndUser';
 
 // Styles
 import styles from './styles';
-import './style.css';
+import './styles.css';
 
-const { Search } = Input;
-
-const shopYoutubeUrl = 'https://www.facebook.com/';
-const shopTwitterUrl = 'https://www.facebook.com/';
-const shopInstagramUrl = 'https://www.instagram.com/';
-const shopGmail = 'example@gmail.com';
-const shopAddress = '24/212 Tran Quang Khai, TP. Nha Trang';
+const { Option } = Select;
 const shopPhone = '0349445935';
 
-const facebookIcon = require('./../../commons/images/icons/facebook.png');
-const rightArrowIcon = require('./../../commons/images/icons/right-arrow.png');
-const pinIcon = require('./../../commons/images/icons/pin.png');
-const phoneIcon = require('./../../commons/images/icons/phone.png');
-const gmailIcon = require('./../../commons/images/icons/gmail.png');
-const userIcon = require('./../../commons/images/icons/user.png');
-const cartIcon = require('./../../commons/images/icons/cart.png');
+// const facebookIcon = require('./../../commons/images/icons/facebook.png');
+// const rightArrowIcon = require('./../../commons/images/icons/right-arrow.png');
+// const pinIcon = require('./../../commons/images/icons/pin.png');
+// const phoneIcon = require('./../../commons/images/icons/phone.png');
+// const gmailIcon = require('./../../commons/images/icons/gmail.png');
+// const userIcon = require('./../../commons/images/icons/user.png');
+// const cartIcon = require('./../../commons/images/icons/cart.png');
 
 const bakeryData = [
     {
@@ -54,9 +49,10 @@ const bakeryData = [
         cake_name: 'Bánh mì Xyz',
         cake_category: 'Bánh mì 2',
         cake_code: 'SW167',
-        cake_price: '36500',
+        cake_price: '10000',
         cake_startedDate: new Date(2019, 9, 24),
-        is_out_stock: true
+        is_out_stock: true,
+        saleOff: '25'
     },
     {
         id: '4',
@@ -143,49 +139,32 @@ const categoryBakeryData = [
     }
 ];
 
-const hMenu = [
-    {
-        image: require('./../../commons/images/icons/facebook.png'),
-        to: 'https://www.facebook.com/'
-    },
-    {
-        image: require('./../../commons/images/icons/youtube.png'),
-        to: shopYoutubeUrl
-    },
-    {
-        image: require('./../../commons/images/icons/instagram.png'),
-        to: shopInstagramUrl
-    },
-    {
-        image: require('./../../commons/images/icons/twitter.png'),
-        to: shopTwitterUrl
-    }
-];
+// function numberWithCommas(x) {
+//     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+// }
 
-const userPopoverOptions = [
-    {
-        title: 'Thông tin tài khoản',
-        path: 'user-information'
-    },
-    {
-        title: 'Lịch sử',
-        path: 'history'
-    },
-    {
-        title: 'Đăng xuất',
-        path: 'logout'
-    }
-];
+function getBase64(img, callback) {
+    const reader = new FileReader();
+    reader.addEventListener('load', () => callback(reader.result));
+    reader.readAsDataURL(img);
+}
 
-function numberWithCommas(x) {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+function beforeUpload(file) {
+    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+    if (!isJpgOrPng) {
+        message.error('You can only upload JPG/PNG file!');
+    }
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+        message.error('Image must smaller than 2MB!');
+    }
+    return isJpgOrPng && isLt2M;
 }
 
 class ComponentPage extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            cart: [],
             user: {
                 role: 'Admin',
                 name: 'Thái Nguyễn'
@@ -202,6 +181,20 @@ class ComponentPage extends Component {
                 banhQuy: [],
                 banhKem: []
             },
+            ModalAddCake: {
+                loading: false,
+                visible: false
+            },
+            formData: {
+                cakeName: '',
+                cakeCategory: '',
+                cakePrice: '',
+                cakeIsOutStock: '',
+                cakeSaleOff: ''
+            },
+            cakeImage: null,
+            loading: null,
+            cakeCategoryEdit: '',
             width: 0,
             height: 0
         }
@@ -254,123 +247,6 @@ class ComponentPage extends Component {
         message.success(item.cake_name);
     };
 
-    updateCartAmount = (item, value) => {
-        const { cart } = this.state;
-        const index = cart.findIndex(obj => obj.cake_name === item.cake_name);
-        if (index !== -1) {
-            let newData = cart;
-            if (value === -1 && newData[index].amount === 0) newData[index].amount += 0;
-            else newData[index].amount += value;
-            this.setState({ cart: newData });
-        }
-    };
-
-    deleteCartItem = (item) => {
-        const { cart } = this.state;
-        const index = cart.findIndex(obj => obj.cake_name === item.cake_name);
-        if (index !== -1) {
-            let newData = cart;
-            newData.splice(index, 1);
-            this.setState({ cart: newData });
-            message.warning(`Bạn đã xóa ${item.cake_name} khỏi giỏ hàng`);
-        }
-    };
-
-    handleClickOptionUserPopover = (path) => {
-        const { history } = this.props;
-        if (path === 'logout') alert('Logout')
-        else history.push(path);
-    };
-
-    userPopover = () => {
-        const { user } = this.state;
-        return (
-            <div style={{ width: 250 }}>
-                {user.name === '' ? (
-                    <button style={styles.facebookLoginBtn}>
-                        <img
-                            src={facebookIcon}
-                            alt=""
-                            style={styles.facebookLoginIcon}
-                        />
-                        <div style={styles.facebookLoginText}>Đăng nhập facebook</div>
-                    </button>
-                ) : (
-                        <div style={{ width: '100%' }}>
-                            {userPopoverOptions.map((item, index) => (
-                                <button
-                                    style={styles.facebookLoginBtn}
-                                    onClick={() => this.handleClickOptionUserPopover(item.path)}
-                                >
-                                    <img
-                                        src={rightArrowIcon}
-                                        alt=""
-                                        style={styles.userPopoverIcon}
-                                    />
-                                    {item.title}
-                                </button>
-                            ))}
-                        </div>
-                    )}
-            </div>
-        );
-    };
-
-    cartPopover = () => {
-        const { cart } = this.state;
-        return (
-            <div style={{ width: 250, maxHeight: 300, overflowY: 'auto', overflowX: 'hidden' }}>
-                {cart.length <= 0 ?
-                    <Empty description="Không có bánh trong giỏ hàng" /> :
-                    <div>
-                        {cart.map((item, index) => (
-                            <div
-                                key={index.toString()}
-                                style={{
-                                    ...styles.eachCartItemWrapper,
-                                    borderTop: index === 0 ? 'solid 1px #d9d9d9' : 'none'
-                                }}
-                            >
-                                <div style={{ width: 100, height: 56, position: 'relative' }}>
-                                    <img src={item.cake_image} alt="" style={{ width: '100%', height: '100%' }} />
-                                    <div style={styles.deleteWrapper} onClick={() => this.deleteCartItem(item)}>
-                                        <Icon
-                                            type="delete"
-                                            style={{ color: '#e85a4f' }}
-                                        />
-                                    </div>
-                                </div>
-                                <div style={{ flex: 1, marginLeft: 5 }}>
-                                    <div style={styles.cartTitleText}>{item.cake_name}</div>
-                                    <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
-                                        <Button
-                                            size="small"
-                                            icon="minus"
-                                            onClick={() => this.updateCartAmount(item, -1)}
-                                        />
-                                        <div style={styles.cartAmountText}>{item.amount}</div>
-                                        <Button
-                                            size="small"
-                                            icon="plus"
-                                            onClick={() => this.updateCartAmount(item, +1)}
-                                        />
-                                        <div style={{
-                                            ...styles.cartAmountText,
-                                            fontSize: '0.6rem',
-                                            position: 'absolute',
-                                            right: 0,
-                                            color: 'green'
-                                        }}>{numberWithCommas(Number(item.cake_price) * Number(item.amount))} VND</div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                }
-            </div>
-        );
-    };
-
     getDropdownOptions = (category) => (
         <Menu>
             <Menu.Item onClick={() => this.onChangeCategoryOption(category.category, 'Tất cả')}>
@@ -420,167 +296,82 @@ class ComponentPage extends Component {
         return false;
     };
 
-    searchCakes = (value) => {
-        message.success(`Bạn đang tìm bánh: ${value}`);
+    showModal = (state) => {
+        const { ModalAddCake } = this.state;
+        if (state === 'ModalAddCake') {
+            let newData = ModalAddCake;
+            newData.visible = true;
+            this.setState({
+                ModalAddCake: newData,
+            });
+        }
+    };
+
+    handleOk = (state) => {
+        this.setState({ loading: true });
+        setTimeout(() => {
+            this.setState({ loading: false, visible: false });
+        }, 3000);
+    };
+
+    handleCancel = (state) => {
+        const { ModalAddCake } = this.state;
+        if (state === 'ModalAddCake') {
+            let newData = ModalAddCake;
+            newData.visible = false;
+            this.setState({
+                ModalAddCake: newData,
+            });
+        }
+    };
+
+    handleUploadChange = info => {
+        if (info.file.status === 'uploading') {
+            this.setState({ loading: true });
+            return;
+        }
+        if (info.file.status === 'done') {
+            // Get this url from response in real world.
+            getBase64(info.file.originFileObj, imageUrl =>
+                this.setState({
+                    cakeImage: imageUrl,
+                    loading: false,
+                }),
+            );
+        }
+    };
+
+    handleSelectChange = (value) => {
+        console.log(`selected ${value}`);
+    };
+
+    onChange = (e, key) => {
+        const { value } = e.target;
+        const { formData } = this.state;
+        let newData = formData;
+        newData[key] = value;
+        this.setState({ formData: newData });
+    };
+
+    addNewCake = (category) => {
+        this.setState({ cakeCategoryEdit: category.name });
+        this.showModal('ModalAddCake');
     };
 
     render() {
-        const { width, user, cart, categorySelected, categoryData } = this.state;
+        const { width, user, categorySelected, categoryData, ModalAddCake, cakeImage, cakeCategoryEdit } = this.state;
+        const uploadButton = (
+            <div>
+                <Icon type={this.state.loading ? 'loading' : 'plus'} />
+                <div className="ant-upload-text">Upload</div>
+            </div>
+        );
         return (
             <div style={styles.container}>
                 <Header handleClickLogo={() => this.handleClickHMenuIcon('/home')} />
                 <Slider />
                 <div style={styles.content}>
-                    <Col xs={22} sm={22} md={18} lg={16} xl={16}
-                        style={{ ...styles.hMenuWrapper, display: width <= 576 ? 'none' : 'flex' }}
-                    >
-                        <div style={{ width: 235, height: '100%', position: 'relative' }}>
-                            <div style={styles.contentHeaderMenuWrapper}>
-                                <div style={styles.contentHeaderMenuWrapperSkew}></div>
-                            </div>
-                            <div style={styles.contentHeaderMenuIcon}>
-                                {
-                                    hMenu.map((item, index) => (
-                                        <img
-                                            key={index.toString()}
-                                            alt=""
-                                            src={item.image}
-                                            style={{ ...styles.hMenuIcon, cursor: 'pointer', marginRight: index < hMenu.length - 1 ? 10 : 0 }}
-                                            className="hoverBtn"
-                                            onClick={() => this.developerGoto(item.to)}
-                                        />
-                                    ))
-                                }
-                            </div>
-                        </div>
-                        <div style={styles.contentHeaderTextWrapper}>
-                            {width > 1600 && (
-                                <div style={{ display: 'flex', alignItems: 'center', marginRight: 50 }}>
-                                    <img
-                                        alt=""
-                                        src={gmailIcon}
-                                        style={{
-                                            ...styles.hMenuIcon,
-                                            width: 20, height: 20, marginRight: 5,
-                                            filter: 'invert(0%) sepia(83%) saturate(7431%) hue-rotate(353deg) brightness(83%) contrast(117%)'
-                                        }}
-                                        className="hoverBtn"
-                                    />
-                                    <div style={styles.hMenuSmallText}>{shopGmail}</div>
-                                </div>
-                            )}
-                            {width > 1200 && (
-                                <div style={{ display: 'flex', alignItems: 'center', marginRight: 50 }}>
-                                    <img
-                                        alt=""
-                                        src={pinIcon}
-                                        style={{
-                                            ...styles.hMenuIcon,
-                                            width: 20,
-                                            height: 20,
-                                            marginRight: 5,
-                                            filter: 'invert(0%) sepia(83%) saturate(7431%) hue-rotate(353deg) brightness(83%) contrast(117%)'
-                                        }}
-                                        className="hoverBtn"
-                                    />
-                                    <div style={styles.hMenuSmallText}>{shopAddress}</div>
-                                </div>
-                            )}
-                            <img
-                                alt=""
-                                src={phoneIcon}
-                                style={{
-                                    ...styles.hMenuIcon,
-                                    width: 20,
-                                    height: 20,
-                                    marginRight: 5,
-                                    filter: 'invert(0%) sepia(83%) saturate(7431%) hue-rotate(353deg) brightness(83%) contrast(117%)'
-                                }}
-                                className="hoverBtn"
-                            />
-                            <div style={{
-                                color: '#000',
-                                fontSize: '0.9rem',
-                                fontFamily: 'Open Sans, sans-serif'
-                            }}>{shopPhone}</div>
-                        </div>
-                    </Col>
-                    <Col xs={22} sm={22} md={18} lg={16} xl={16}
-                        style={{
-                            ...styles.cartWrapper,
-                            marginTop: width <= 576 ? 0 : 10
-                        }}
-                    >
-                        {width <= 576 && (
-                            <div style={{ display: 'flex', alignItems: 'center', position: 'absolute', left: 0 }}>
-                                <div style={{
-                                    ...styles.hMenuSmallText,
-                                    marginRight: 5,
-                                }}>Liên hệ:</div>
-                                <img
-                                    alt=""
-                                    src={phoneIcon}
-                                    style={{
-                                        width: 20,
-                                        height: 20,
-                                        marginRight: 5,
-                                        filter: 'invert(0%) sepia(83%) saturate(7431%) hue-rotate(353deg) brightness(83%) contrast(117%)'
-                                    }}
-                                    className="hoverBtn"
-                                />
-                                <div style={styles.hMenuSmallText}>{shopPhone}</div>
-                            </div>
-                        )}
-                        <Popover
-                            content={this.cartPopover()}
-                            trigger="click"
-                            placement="bottomRight"
-                            title="Giỏ hàng của bạn"
-                        >
-                            <div
-                                style={{ marginRight: 10, position: 'relative', cursor: 'pointer' }}
-                                onClick={null}
-                            >
-                                <img
-                                    alt=""
-                                    src={cartIcon}
-                                    style={{ ...styles.cartIcon }}
-                                />
-                                {cart.length > 0 && (
-                                    <div style={styles.badgeWrapper}>
-                                        <div style={{ fontSize: '0.7rem', color: 'white' }}>
-                                            {cart.length + 1 > 9 ? '9+' : cart.length}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </Popover>
-                        <Popover
-                            content={this.userPopover()}
-                            trigger="click"
-                            placement="bottomRight"
-                            title={user.name === '' ? 'Vui lòng đăng nhập' : `Chào ${user.name}`}
-                        >
-                            <img
-                                alt=""
-                                src={userIcon}
-                                style={styles.cartIcon}
-                                onClick={null}
-                            />
-                        </Popover>
-                    </Col>
-                    <Col xs={22} sm={22} md={18} lg={16} xl={16}
-                        style={{
-                            ...styles.cartWrapper,
-                            marginTop: 20
-                        }}
-                    >
-                        <Search
-                            placeholder="Nhập tên bánh cần tìm"
-                            onSearch={value => this.searchCakes(value)}
-                            style={{ maxWidth: 300 }}
-                        />
-                    </Col>
+                    <CartAndUser {...this.props} />
                     <Col xs={22} sm={22} md={18} lg={16} xl={16} style={{ marginBottom: 20 }}>
                         {categoryBakeryData.map((category, ind) => (
                             <div key={ind.toString()} style={styles.eachCategory}>
@@ -602,7 +393,7 @@ class ComponentPage extends Component {
                                             <Button
                                                 icon="plus"
                                                 loading={false}
-                                                onClick={() => alert(category.name)}
+                                                onClick={() => this.addNewCake(category)}
                                             >
                                                 <span style={{ fontFamily: 'Montserrat, sans-serif' }}>Thêm bánh</span>
                                             </Button>
@@ -616,7 +407,7 @@ class ComponentPage extends Component {
                                         handleClickBuyBakery={this.handleClickBuyBakery}
                                         handleClickEdit={this.handleClickEdit}
                                         isNewCake={this.isNewCake}
-                                        // limit={3}
+                                    // limit={3}
                                     />
                                     <div style={styles.showMoreWrapper}>
                                         <div
@@ -633,6 +424,50 @@ class ComponentPage extends Component {
                     </Col>
                 </div>
                 <Footer width={width} developerGoto={this.developerGoto} />
+                <Modal
+                    visible={ModalAddCake.visible}
+                    title={`Thêm bánh - ${cakeCategoryEdit}`}
+                    onOk={() => this.handleOk('ModalAddCake')}
+                    onCancel={() => this.handleCancel('ModalAddCake')}
+                    footer={[
+                        <Button key="back" onClick={() => this.handleCancel('ModalAddCake')}>
+                            Cancel
+                        </Button>,
+                        <Button key="submit" type="primary" loading={ModalAddCake.loading} onClick={() => this.handleOk('ModalAddCake')}>
+                            Save
+                        </Button>
+                    ]}
+                >
+                    <div style={{ fontSize: '0.9rem', marginBottom: 5 }}>Tên bánh</div>
+                    <Input style={{ marginBottom: 10 }} onChange={e => this.onChange(e, 'cakeName')} />
+                    <div style={{ fontSize: '0.9rem', marginBottom: 5 }}>Danh mục</div>
+                    <Input style={{ marginBottom: 10 }} onChange={e => this.onChange(e, 'cakeCategory')} />
+                    <div style={{ fontSize: '0.9rem', marginBottom: 5 }}>Giá</div>
+                    <Input style={{ marginBottom: 10 }} onChange={e => this.onChange(e, 'cakePrice')} />
+                    <div style={{ width: '100%', display: 'flex', alignItems: 'center' }}>
+                        <div style={{ flex: 1, marginRight: 20 }}>
+                            <Select defaultValue="outStock" style={{ width: 120 }} onChange={this.handleSelectChange}>
+                                <Option value="inStock">Còn hàng</Option>
+                                <Option value="outStock">Hết hàng</Option>
+                            </Select>
+                            <div style={{ fontSize: '0.9rem', marginBottom: 5, marginTop: 5 }}>Giảm giá</div>
+                            <Input onChange={e => this.onChange(e, 'cakeSaleOff')} />
+                        </div>
+                        <div>
+                            <Upload
+                                name="avatar"
+                                listType="picture-card"
+                                className="avatar-uploader"
+                                showUploadList={false}
+                                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                                beforeUpload={beforeUpload}
+                                onChange={this.handleUploadChange}
+                            >
+                                {cakeImage ? <img src={cakeImage} alt="" style={{ width: '100%' }} /> : uploadButton}
+                            </Upload>
+                        </div>
+                    </div>
+                </Modal>
             </div>
         );
     }
