@@ -98,6 +98,16 @@ const bakeryData = [
 
 const categoryBakeryData = [
     {
+        name: 'Đặt bánh',
+        category: 'datBanh',
+        categoryData: [
+            { name: 'Đặt bánh 1' },
+            { name: 'Đặt bánh 2' }
+        ],
+        data: bakeryData,
+        path: '/dat-banh'
+    },
+    {
         name: 'Bánh mì',
         category: 'banhMi',
         categoryData: [
@@ -170,6 +180,7 @@ class ComponentPage extends Component {
                 name: 'Thái Nguyễn'
             },
             categorySelected: {
+                datBanh: '',
                 banhMi: '',
                 banhPizza: '',
                 banhQuy: '',
@@ -179,7 +190,8 @@ class ComponentPage extends Component {
                 banhMi: [],
                 banhPizza: [],
                 banhQuy: [],
-                banhKem: []
+                banhKem: [],
+                datBanh: []
             },
             ModalAddCake: {
                 loading: false,
