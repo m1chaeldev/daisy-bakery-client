@@ -1,4 +1,4 @@
-import { call, put, takeLatest } from 'redux-saga/effects';
+import { all, fork, call, put, takeLatest } from 'redux-saga/effects';
 import { message } from 'antd';
 
 import Actions from './actions';
@@ -23,8 +23,14 @@ function* handleLogin(action) {
   }
 }
 
-function* sagas() {
+
+function* watchLoginRequest() {
   yield takeLatest(Actions.loginRequest, handleLogin);
 }
 
-export default sagas;
+export default function* rootSaga() {
+  yield all([
+    fork(watchLoginRequest),
+    // fork(watchLoginRequest)
+  ]);
+}
