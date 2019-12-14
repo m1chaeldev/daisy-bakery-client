@@ -4,7 +4,7 @@ import Actions from './actions';
 import { createReducer } from '../../utils/redux';
 
 const initialState = {
-  cake: {
+  cart: {
     data: undefined,
     isFetching: false
   }
@@ -12,10 +12,10 @@ const initialState = {
 
 const reducer = [
   {
-    on: Actions.getAllCakesRequest,
+    on: Actions.getAllCartsRequest,
     handler: state =>
       update(state, {
-        cake: {
+        cart: {
           isFetching: {
             $set: true
           }
@@ -23,10 +23,10 @@ const reducer = [
       })
   },
   {
-    on: Actions.getAllCakesFailure,
+    on: Actions.getAllCartsFailure,
     handler: state =>
       update(state, {
-        cake: {
+        cart: {
           isFetching: {
             $set: false
           }
@@ -34,11 +34,11 @@ const reducer = [
       })
   },
   {
-    on: Actions.getAllCakesSuccess,
+    on: Actions.getAllCartsSuccess,
     handler: (state, action) => {
       const data = action.payload;
       return update(state, {
-        cake: {
+        cart: {
           data: {
             $set: data
           },

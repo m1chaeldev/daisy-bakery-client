@@ -1,1 +1,1 @@
-export const GET_ALL_CAKES = 'GET_ALL_CAKES';
+export const GET_ALL_CARTS = 'GET_ALL_CARTS';

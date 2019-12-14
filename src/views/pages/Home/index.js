@@ -9,19 +9,25 @@ import { connect } from "react-redux";
 import ComponentPage from "./Component";
 // Action
 import CakeActions from "../../../redux/cake/actions"
+import CategoryActions from "../../../redux/category/actions"
+import CartActions from "../../../redux/cart/actions"
 
 class ContainerPage extends Component {
 
   componentDidMount = () => {
     const {
-      getAllCakesRequest
+      getAllCakesRequest,
+      getAllCartsRequest,
+      getAllCategoriesRequest
     } = this.props;
     getAllCakesRequest();
+    getAllCategoriesRequest();
+    getAllCartsRequest();
   };
 
   render() {
-    const { isFetchingCake } = this.props;
-    return isFetchingCake ? (
+    const { isFetchingCake, isFetchingCart, isFetchingCategory } = this.props;
+    return isFetchingCake && isFetchingCart && isFetchingCategory ? (
       <Row
         style={{ height: '100vh' }}
         type="flex"
@@ -46,12 +52,18 @@ class ContainerPage extends Component {
 
 const mapActionToProps = {
   getAllCakesRequest: CakeActions.getAllCakesRequest,
+  getAllCategoriesRequest: CategoryActions.getAllCategoriesRequest,
+  getAllCartsRequest: CartActions.getAllCartsRequest
 };
 
 const mapStateToProps = state => {
   return {
     cakeData: state.cake.cake.data,
-    isFetchingCake: state.cake.cake.isFetching
+    isFetchingCake: state.cake.cake.isFetching,
+    categoryData: state.category.category.data,
+    isFetchingCategory: state.category.category.isFetching,
+    cartData: state.cart.cart.data,
+    isFetchingCart: state.cart.cart.isFetching
   };
 };
 

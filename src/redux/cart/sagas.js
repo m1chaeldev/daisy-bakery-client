@@ -4,28 +4,28 @@ import { message } from 'antd';
 import Actions from './actions';
 import APIs from './apis';
 
-function* handleGetAllCakes(action) {
+function* handleGetAllCarts(action) {
   try {
-    const res = yield call(APIs.getAllCakes);
+    const res = yield call(APIs.getAllCarts);
     if (res && res.message === 'OK') {
-      yield put(Actions.getAllCakesSuccess(res.data));
+      yield put(Actions.getAllCartsSuccess(res.data));
     } else {
-      yield put(Actions.getAllCakesFailure());
+      yield put(Actions.getAllCartsFailure());
     }
   } catch (err) {
-    yield put(Actions.getAllCakesFailure());
+    yield put(Actions.getAllCartsFailure());
     yield console.log(err);
   }
 }
 
 
-function* watchGetAllCakesRequest() {
-  yield takeLatest(Actions.getAllCakesRequest, handleGetAllCakes);
+function* watchGetAllCartsRequest() {
+  yield takeLatest(Actions.getAllCartsRequest, handleGetAllCarts);
 }
 
 export default function* rootSaga() {
   yield all([
-    fork(watchGetAllCakesRequest),
+    fork(watchGetAllCartsRequest),
     // fork(watchLoginRequest)
   ]);
 }

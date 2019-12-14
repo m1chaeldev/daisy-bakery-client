@@ -1,12 +1,12 @@
 import restful from '../../utils/restful';
 
-async function getAllCakes() {
+async function getAllCarts() {
   try {
-    const res = await restful.GET('/product');
+    const res = await restful.GET('/cart');
     return res;
   } catch (err) {
     return err;
   }
 }
 
-export default { getAllCakes };
+export default { getAllCarts };

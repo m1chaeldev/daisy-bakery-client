@@ -4,18 +4,19 @@ import Actions from './actions';
 import { createReducer } from '../../utils/redux';
 
 const initialState = {
-  cake: {
+  category: {
     data: undefined,
+    child: undefined,
     isFetching: false
   }
 };
 
 const reducer = [
   {
-    on: Actions.getAllCakesRequest,
+    on: Actions.getAllCategoriesRequest,
     handler: state =>
       update(state, {
-        cake: {
+        category: {
           isFetching: {
             $set: true
           }
@@ -23,10 +24,10 @@ const reducer = [
       })
   },
   {
-    on: Actions.getAllCakesFailure,
+    on: Actions.getAllCategoriesFailure,
     handler: state =>
       update(state, {
-        cake: {
+        category: {
           isFetching: {
             $set: false
           }
@@ -34,13 +35,16 @@ const reducer = [
       })
   },
   {
-    on: Actions.getAllCakesSuccess,
+    on: Actions.getAllCategoriesSuccess,
     handler: (state, action) => {
-      const data = action.payload;
+      const { category, child } = action.payload;
       return update(state, {
-        cake: {
+        category: {
           data: {
-            $set: data
+            $set: category
+          },
+          child: {
+            $set: child
           },
           isFetching: {
             $set: false
