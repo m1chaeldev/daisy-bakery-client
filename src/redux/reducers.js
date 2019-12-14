@@ -1,9 +1,14 @@
 import { combineReducers } from 'redux';
 
-// import AppReducer from './app/reducer';
 import AccountReducer from './account/reducers';
+import CakeReducer from './cake/reducers';
+import CategoryReducer from './category/reducers';
+import CartReducer from './cart/reducers';
+
 
 export default combineReducers({
-  // ...AppReducer,
-  AccountReducer
+  ...AccountReducer,
+  ...CakeReducer,
+  ...CategoryReducer,
+  ...CartReducer
 });

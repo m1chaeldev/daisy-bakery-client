@@ -1,12 +1,13 @@
-const API_URL = 'http://192.168.1.16:55544/';
+const API_URL = 'http://localhost:4000/api/v1';
 
 async function request(path, method, payload = {}) {
   try {
     const url = new URL(`${API_URL}${path}`);
+
     const options = {
       method,
       headers: {
-        Authorization: localStorage.getItem('token') || '',
+        Authorization: `bearer ${localStorage.getItem('token')}` || '',
         'Content-Type': 'application/json'
       }
     };
@@ -15,17 +16,26 @@ async function request(path, method, payload = {}) {
       Object.keys(payload).forEach(key =>
         url.searchParams.append(key, payload[key])
       );
-
     if (method === 'POST' || method === 'PUT')
       options.body = JSON.stringify(payload);
+
     const res = await fetch(url, options);
-    if (!res.ok) throw Error(res.statusText);
-    return await res.json();
+    const resJson = await res.json();
+
+    if (resJson && resJson.message === 'Request unauthenticated') {
+      localStorage.clear();
+      // window.location.replace('/');
+    }
+
+    return resJson;
   } catch (err) {
-    if (err.toString().includes('Failed to fetch')) {
-      const res = { error: 'Failed to fetch' };
-      throw res;
-    } else throw err;
+    const res = {
+      error: err.toString().includes('Failed to fetch')
+        ? 'Failed to fetch'
+        : err,
+      message: 'Failed to fetch'
+    };
+    throw res;
   }
 }
 
