@@ -53,20 +53,23 @@ class ComponentPage extends Component {
                 role: 'Admin',
                 name: 'Thái Nguyễn'
             },
+            categorySelected: {
+                datBanh: '',
+                banhMi: '',
+                banhPizza: '',
+                banhQuy: '',
+                banhKem: ''
+            },
             ModalAddCake: {
                 loading: false,
                 visible: false
             },
             formData: {
-                name: '',
-                image: '',
-                is_out_stock: 'false',
-                category: '',
-                category_child: '',
-                code: '',
-                price: '',
-                sale_off: '',
-                serverKey: 'tuoilzphaduoctao123'
+                cakeName: '',
+                cakeCategory: '',
+                cakePrice: '',
+                cakeIsOutStock: '',
+                cakeSaleOff: ''
             },
             cakeImage: null,
             loading: null,
@@ -104,13 +107,13 @@ class ComponentPage extends Component {
     handleClickBuyBakery = (item) => {
         if (item.is_out_stock) return message.error(`Bánh này hiện tại đã hết, vui lòng liên hệ ${shopPhone}`);
         const { cart } = this.state;
-        const isExist = cart.findIndex(obj => obj.name === item.name);
+        const isExist = cart.findIndex(obj => obj.cake_name === item.cake_name);
         if (isExist === -1) {
             let bakery = [...cart];
             const newItem = { ...item, amount: 1 };
             bakery.push(newItem);
             this.setState({ cart: bakery });
-            message.success(`Đã thêm "${item.name}" vào giỏ hàng`);
+            message.success(`Đã thêm "${item.cake_name}" vào giỏ hàng`);
         } else {
             let newData = cart;
             newData[isExist].amount += 1;
@@ -120,7 +123,61 @@ class ComponentPage extends Component {
 
     handleClickEdit = (e, item) => {
         e.stopPropagation();
-        message.success(item.name);
+        message.success(item.cake_name);
+    };
+
+    getDropdownOptions = (category) => {
+        const { categoryData } = this.props;
+        const { child, data } = categoryData;
+        return (
+            // <Menu>
+            //     <Menu.Item onClick={() => this.onChangeCategoryOption(category.category, 'Tất cả')}>
+            //         <span style={{ fontFamily: 'Montserrat, sans-serif' }}>
+            //             Tất cả
+            //     </span>
+            //     </Menu.Item>
+            //     {category.categoryData.map((item, index) => (
+            //         <Menu.Item
+            //             key={index.toString()}
+            //             onClick={() => this.onChangeCategoryOption(category.category, item.name)}
+            //         >
+            //             <span style={{ fontFamily: 'Montserrat, sans-serif' }}>
+            //                 {item.name}
+            //             </span>
+            //         </Menu.Item>
+            //     ))}
+            // </Menu>
+            <Select
+                style={{ width: 150 }}
+                defaultValue=""
+                onChange={this.handleCategorySelectChange}
+            >
+                <Option value="">Tất cả</Option>
+                <Option value="inStock">Còn hàng</Option>
+                <Option value="outStock">Hết hàng</Option>
+            </Select>
+        );
+    }
+
+    onChangeCategoryOption = (key, value) => {
+        const { categorySelected } = this.state;
+        let newData = categorySelected;
+        newData[key] = value;
+        this.setState({ categorySelected: newData });
+        this.onCategoryFilter(key, value);
+    };
+
+    onCategoryFilter = (key, value) => {
+        // const { categorySelected, categoryData } = this.state;
+        // if (categorySelected[key] !== '') {
+        //     const categoryValue = value.toLowerCase();
+        //     const index = categoryBakeryData.findIndex(obj => obj.category === key);
+        //     const listCakes = categoryBakeryData[index].data;
+        //     const query = listCakes.filter(obj => obj.cake_category.toLowerCase().includes(categoryValue));
+        //     const newData = categoryData;
+        //     newData[key] = query;
+        //     this.setState({ categoryData: newData });
+        // }
     };
 
     isNewCake = (startedDate) => {
@@ -176,38 +233,29 @@ class ComponentPage extends Component {
         }
     };
 
-    onChangeFormData = (value, key) => {
+    handleSelectChange = (value) => {
+        console.log(`selected ${value}`);
+    };
+
+    handleCategorySelectChange = (value) => {
+        console.log(`selected ${value}`);
+    };
+
+    onChange = (e, key) => {
+        const { value } = e.target;
         const { formData } = this.state;
         let newData = formData;
         newData[key] = value;
         this.setState({ formData: newData });
     };
 
-    getChildCategories = (category) => {
-        const { categoryData } = this.props;
-        const child = categoryData && categoryData.child ? categoryData.child.filter(obj => obj.category === category._id) : [];
-        return child;
-    };
-
     addNewCake = (category) => {
-        const { categoryData } = this.props;
-        const { formData } = this.state;
-        const newData = formData;
-        newData.category = category._id;
-        const child = categoryData && categoryData.child ? categoryData.child.filter(obj => obj.category === category._id) : [];
-        newData.category_child = child.length > 0 ? child[0]._id : null;
-        this.setState({ cakeCategoryEdit: category, formData: newData });
+        this.setState({ cakeCategoryEdit: category.name });
         this.showModal('ModalAddCake');
     };
 
-    getCakeData = (category) => {
-        const { cakeData } = this.props;
-        let data = cakeData.filter(obj => obj.category === category._id);
-        return data;
-    };
-
     render() {
-        const { width, user, ModalAddCake, cakeImage, cakeCategoryEdit, loading, formData } = this.state;
+        const { width, user, categorySelected, ModalAddCake, cakeImage, cakeCategoryEdit } = this.state;
         const { categoryData } = this.props;
         const uploadButton = (
             <div>
@@ -228,7 +276,7 @@ class ComponentPage extends Component {
                                     <div style={styles.categoryTitleText}>{category.name}</div>
                                 </div>
                                 <div style={styles.categoryOptionsWrapper}>
-                                    <div style={{ width: 1, height: 20 }}></div>
+                                    {this.getDropdownOptions(category)}
                                     {user.role === 'Admin' && (
                                         <div style={styles.addCakeWrapper}>
                                             <Button
@@ -243,7 +291,8 @@ class ComponentPage extends Component {
                                 </div>
                                 <div>
                                     <ListCakes
-                                        data={this.getCakeData(category)}
+                                        data={[]}
+                                        // data={categoryData[category.category].length > 0 ? categoryData[category.category] : category.data}
                                         user={user}
                                         handleClickBuyBakery={this.handleClickBuyBakery}
                                         handleClickEdit={this.handleClickEdit}
@@ -267,60 +316,32 @@ class ComponentPage extends Component {
                 <Footer width={width} developerGoto={this.developerGoto} />
                 <Modal
                     visible={ModalAddCake.visible}
-                    title={`Thêm bánh - ${cakeCategoryEdit.name}`}
+                    title={`Thêm bánh - ${cakeCategoryEdit}`}
                     onOk={() => this.handleOk('ModalAddCake')}
                     onCancel={() => this.handleCancel('ModalAddCake')}
                     footer={[
                         <Button key="back" onClick={() => this.handleCancel('ModalAddCake')}>
-                            Đóng
+                            Cancel
                         </Button>,
-                        <Button
-                            key="submit"
-                            type="primary"
-                            loading={ModalAddCake.loading || loading ? true : false}
-                            onClick={() => this.handleOk('ModalAddCake')}
-                        >
-                            Đồng ý
+                        <Button key="submit" type="primary" loading={ModalAddCake.loading} onClick={() => this.handleOk('ModalAddCake')}>
+                            Save
                         </Button>
                     ]}
                 >
                     <div style={{ fontSize: '0.9rem', marginBottom: 5 }}>Tên bánh</div>
-                    <Input
-                        style={{ marginBottom: 10 }}
-                        value={formData.name}
-                        onChange={e => this.onChangeFormData(e.target.value, 'name')}
-                    />
+                    <Input style={{ marginBottom: 10 }} onChange={e => this.onChange(e, 'cakeName')} />
                     <div style={{ fontSize: '0.9rem', marginBottom: 5 }}>Danh mục</div>
-                    <Select
-                        value={formData.category_child}
-                        style={{ width: '100%', marginBottom: 5 }}
-                        onChange={value => this.onChangeFormData(value, 'category_child')}
-                    >
-                        {this.getChildCategories(cakeCategoryEdit).map(child => (
-                            <Option key={child._id} value={child._id}>{child.name}</Option>
-                        ))}
-                    </Select>
+                    <Input style={{ marginBottom: 10 }} onChange={e => this.onChange(e, 'cakeCategory')} />
                     <div style={{ fontSize: '0.9rem', marginBottom: 5 }}>Giá</div>
-                    <Input
-                        style={{ marginBottom: 10 }}
-                        value={formData.price}
-                        onChange={e => this.onChangeFormData(e.target.value, 'price')}
-                    />
+                    <Input style={{ marginBottom: 10 }} onChange={e => this.onChange(e, 'cakePrice')} />
                     <div style={{ width: '100%', display: 'flex', alignItems: 'center' }}>
                         <div style={{ flex: 1, marginRight: 20 }}>
-                            <Select
-                                style={{ width: 120 }}
-                                value={formData.is_out_stock}
-                                onChange={value => this.onChangeFormData(value, 'is_out_stock')}
-                            >
-                                <Option value="false">Còn hàng</Option>
-                                <Option value="true">Hết hàng</Option>
+                            <Select defaultValue="outStock" style={{ width: 120 }} onChange={this.handleSelectChange}>
+                                <Option value="inStock">Còn hàng</Option>
+                                <Option value="outStock">Hết hàng</Option>
                             </Select>
                             <div style={{ fontSize: '0.9rem', marginBottom: 5, marginTop: 5 }}>Giảm giá</div>
-                            <Input
-                                value={formData.sale_off}
-                                onChange={e => this.onChangeFormData(e.target.value, 'sale_off')}
-                            />
+                            <Input onChange={e => this.onChange(e, 'cakeSaleOff')} />
                         </div>
                         <div>
                             <Upload

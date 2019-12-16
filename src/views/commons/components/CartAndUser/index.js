@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import { Input, Empty, Col, message, Popover, Button, Icon, Modal, Card } from 'antd';
+import { Input, Empty, Col, message, Popover, Button, Icon, Modal, Card, Select } from 'antd';
 // import LoadingIcon from './../../commons/components/LoadingIcon';
 
 // Styles
 import styles from './styles';
 import './styles.css';
 
+const { Option } = Select;
 const { Search } = Input;
 const { TextArea } = Input;
 
@@ -23,6 +24,7 @@ const phoneIcon = require('./../../images/icons/phone.png');
 const gmailIcon = require('./../../images/icons/gmail.png');
 const userIcon = require('./../../images/icons/user.png');
 const cartIcon = require('./../../images/icons/cart.png');
+const settingsIcon = require('./../../images/icons/settings.png');
 
 const hMenu = [
     {
@@ -102,9 +104,20 @@ class ComponentPage extends Component {
                 loading: false,
                 visible: false
             },
+            ModalSettings: {
+                loading: false,
+                visible: false
+            },
             ModalPayment: {
                 loading: false,
                 visible: false
+            },
+            addToCategory: 1,
+            formData: {
+                category: '',
+                category_name: '',
+                category_child: undefined,
+                category_child_name: ''
             },
             width: 0,
             height: 0
@@ -160,28 +173,49 @@ class ComponentPage extends Component {
     };
 
     showModal = (state) => {
-        const { ModalHistory, ModalUserInformation, ModalPayment } = this.state;
+        const { ModalHistory, ModalUserInformation, ModalPayment, ModalSettings, formData } = this.state;
+        const { categoryData } = this.props;
         if (state === 'ModalUserInformation') {
             let newData = ModalUserInformation;
             newData.visible = true;
             this.setState({
-                ModalUserInformation: newData,
+                [state]: newData,
             });
         }
         if (state === 'ModalHistory') {
             let newData = ModalHistory;
             newData.visible = true;
             this.setState({
-                ModalHistory: newData,
+                [state]: newData,
             });
         }
         if (state === 'ModalPayment') {
             let newData = ModalPayment;
             newData.visible = true;
             this.setState({
-                ModalPayment: newData,
+                [state]: newData,
             });
         }
+        if (state === 'ModalSettings') {
+            let newData = ModalSettings;
+            newData.visible = true;
+            let stateData = formData;
+            stateData.category = categoryData && categoryData.data ? categoryData.data[0]._id : '';
+            stateData.category_name = categoryData && categoryData.data ? categoryData.data[0].name : '';
+            const categoryChild = stateData.category !== '' ? this.getChildCategoriesById(stateData.category) : '';
+            stateData.category_child = categoryChild.length > 0 ? categoryChild[0]._id : undefined;
+            stateData.category_child_name = categoryChild.length > 0 ? categoryChild[0].name : '';
+            this.setState({
+                [state]: newData,
+                formData: stateData
+            });
+        }
+    };
+
+    getChildCategoriesById = (id) => {
+        const { categoryData } = this.props;
+        const child = categoryData && categoryData.child ? categoryData.child.filter(obj => obj.category === id) : [];
+        return child;
     };
 
     handleOk = (state) => {
@@ -192,26 +226,33 @@ class ComponentPage extends Component {
     };
 
     handleCancel = (state) => {
-        const { ModalHistory, ModalUserInformation, ModalPayment } = this.state;
+        const { ModalHistory, ModalUserInformation, ModalPayment, ModalSettings } = this.state;
         if (state === 'ModalUserInformation') {
             let newData = ModalUserInformation;
             newData.visible = false;
             this.setState({
-                ModalUserInformation: newData,
+                [state]: newData,
             });
         }
         if (state === 'ModalHistory') {
             let newData = ModalHistory;
             newData.visible = false;
             this.setState({
-                ModalHistory: newData,
+                [state]: newData,
             });
         }
         if (state === 'ModalPayment') {
             let newData = ModalPayment;
             newData.visible = false;
             this.setState({
-                ModalPayment: newData,
+                [state]: newData,
+            });
+        }
+        if (state === 'ModalSettings') {
+            let newData = ModalSettings;
+            newData.visible = false;
+            this.setState({
+                [state]: newData,
             });
         }
     };
@@ -335,12 +376,47 @@ class ComponentPage extends Component {
         message.success(`Bạn đang tìm bánh: ${value}`);
     };
 
-    onChange = (e, key) => {
-        const { value } = e.target;
+    onChangeFormData = (value, key) => {
+        const { formData } = this.state;
+        let newData = formData;
+        newData[key] = value;
+        this.setState({ formData: newData });
+    };
+
+    onChangeFormDataForEdit = (value, category, key) => {
+        const { formData } = this.state;
+        let newData = formData;
+        newData[key] = value;
+        const child = category.props.category;
+        if (key === 'category') {
+            newData.category_name = child.name;
+            const categoryChildOfCategory = this.getChildCategoriesById(child._id);
+            newData.category_child = categoryChildOfCategory && categoryChildOfCategory[0] && categoryChildOfCategory[0]._id ?
+                categoryChildOfCategory[0]._id : undefined;
+            newData.category_child_name = categoryChildOfCategory && categoryChildOfCategory[0] && categoryChildOfCategory[0].name ?
+                categoryChildOfCategory[0].name : '';
+        }
+        if (key === 'category_child') {
+            newData.category_child_name = child.name;
+        }
+        this.setState({ formData: newData });
     };
 
     render() {
-        const { width, user, cart, ModalHistory, ModalUserInformation, ModalPayment } = this.state;
+        const {
+            width,
+            user,
+            cart,
+            ModalHistory,
+            ModalUserInformation,
+            ModalPayment,
+            ModalSettings,
+            addToCategory,
+            formData
+        } = this.state;
+        const {
+            categoryData
+        } = this.props;
         return (
             <div style={styles.content}>
                 <Col xs={22} sm={22} md={18} lg={16} xl={16}
@@ -443,6 +519,12 @@ class ComponentPage extends Component {
                             <div style={styles.hMenuSmallText}>{shopPhone}</div>
                         </div>
                     )}
+                    <img
+                        alt=""
+                        src={settingsIcon}
+                        style={{ ...styles.cartIcon, marginRight: 10 }}
+                        onClick={() => this.showModal('ModalSettings')}
+                    />
                     <Popover
                         content={this.cartPopover()}
                         trigger="click"
@@ -494,6 +576,133 @@ class ComponentPage extends Component {
                     />
                 </Col>
                 <Modal
+                    visible={ModalSettings.visible}
+                    title="Thiết lập"
+                    zIndex={10000}
+                    onOk={() => this.handleOk('ModalSettings')}
+                    onCancel={() => this.handleCancel('ModalSettings')}
+                    footer={[
+                        <Button key="back" onClick={() => this.handleCancel('ModalSettings')}>
+                            Đóng
+                        </Button>,
+                        // <Button key="submit" type="primary" loading={ModalSettings.loading} onClick={() => this.handleOk('ModalSettings')}>
+                        //     Đồng ý
+                        // </Button>
+                    ]}
+                >
+                    <Button
+                        type={addToCategory === 1 ? 'primary' : 'default'}
+                        onClick={() => this.setState({ addToCategory: 1 })}
+                    >Tạo mới</Button>
+                    <Button
+                        type={addToCategory === 2 ? 'primary' : 'default'}
+                        style={{ marginLeft: 10 }}
+                        onClick={() => this.setState({ addToCategory: 2 })}
+                    >Sửa hoặc xóa</Button>
+                    <div style={{ marginTop: 20 }}>
+                        {addToCategory === 2 && (
+                            <div>
+                                <div style={{ fontSize: '0.9rem', marginBottom: 5 }}>Danh mục</div>
+                                <Select
+                                    value={formData.category}
+                                    style={{ width: '100%', marginBottom: 5 }}
+                                    dropdownStyle={{ zIndex: 99999999999 }}
+                                    onChange={(value, category) => this.onChangeFormDataForEdit(value, category, 'category')}
+                                >
+                                    {categoryData && categoryData.data ? categoryData.data.map(category => (
+                                        <Option
+                                            key={category._id}
+                                            value={category._id}
+                                            category={category}
+                                        >{category.name}</Option>
+                                    )) : null}
+                                </Select>
+                                <div style={{ fontSize: '0.9rem', marginBottom: 5 }}>Tên danh mục</div>
+                                <Input
+                                    style={{ marginBottom: 10 }}
+                                    value={formData.category_name}
+                                    onChange={e => this.onChangeFormData(e.target.value, 'category_name')}
+                                />
+                                <div style={{ marginBottom: 20 }}>
+                                    <Button
+                                        type="primary"
+                                        style={{ marginRight: 20, width: 120 }}
+                                        onClick={null}
+                                    >Sửa</Button>
+                                    <Button
+                                        type="danger"
+                                        style={{ width: 120 }}
+                                        onClick={null}
+                                    >Xóa</Button>
+                                </div>
+                                <div style={{ fontSize: '0.9rem', marginBottom: 5 }}>Danh mục con</div>
+                                <Select
+                                    value={formData.category_child}
+                                    style={{ width: '100%', marginBottom: 5 }}
+                                    placeholder="Chọn một danh mục con"
+                                    dropdownStyle={{ zIndex: 99999999999 }}
+                                    onChange={(value, category) => this.onChangeFormDataForEdit(value, category, 'category_child')}
+                                >
+                                    {formData.category !== null ? this.getChildCategoriesById(formData.category).map(category => (
+                                        <Option
+                                            key={category._id}
+                                            value={category._id}
+                                            category={category}
+                                        >{category.name}</Option>
+                                    )) : null}
+                                </Select>
+                                <div style={{ fontSize: '0.9rem', marginBottom: 5 }}>Tên danh mục con</div>
+                                <Input
+                                    style={{ marginBottom: 10 }}
+                                    value={formData.category_child_name}
+                                    placeholder="Chọn một danh mục con"
+                                    disabled={formData.category_child_name !== '' ? false : true}
+                                    onChange={e => this.onChangeFormData(e.target.value, 'category_child_name')}
+                                />
+                                <div style={{ marginBottom: 20 }}>
+                                    <Button
+                                        type="primary"
+                                        style={{ marginRight: 20, width: 120 }}
+                                        onClick={null}
+                                    >Sửa</Button>
+                                    <Button
+                                        type="danger"
+                                        style={{ width: 120 }}
+                                        onClick={null}
+                                    >Xóa</Button>
+                                </div>
+                            </div>
+                        )}
+                        {addToCategory === 1 && (
+                            <div>
+                                <div style={{ fontSize: '0.9rem', marginBottom: 5 }}>Tên danh mục</div>
+                                <Input
+                                    style={{ marginBottom: 10 }}
+                                    value={formData.create_category_name}
+                                    placeholder="Nhập tên danh mục mới"
+                                    onChange={e => this.onChangeFormData(e.target.value, 'create_category_name')}
+                                />
+                                <Button
+                                    type="primary"
+                                    style={{ width: 120, marginBottom: 20 }}
+                                    onClick={null}
+                                >Thêm</Button>
+                                <div style={{ fontSize: '0.9rem', marginBottom: 5 }}>Tên danh mục con</div>
+                                <Input
+                                    style={{ marginBottom: 10 }}
+                                    value={formData.create_category_child_name}
+                                    placeholder="Nhập tên danh mục con mới"
+                                    onChange={e => this.onChangeFormData(e.target.value, 'create_category_child_name')}
+                                />
+                                <Button
+                                    type="primary"
+                                    style={{ width: 120 }}
+                                >Thêm</Button>
+                            </div>
+                        )}
+                    </div>
+                </Modal>
+                <Modal
                     visible={ModalUserInformation.visible}
                     title="Thông tin tài khoản"
                     zIndex={10000}
@@ -501,10 +710,10 @@ class ComponentPage extends Component {
                     onCancel={() => this.handleCancel('ModalUserInformation')}
                     footer={[
                         <Button key="back" onClick={() => this.handleCancel('ModalUserInformation')}>
-                            Cancel
+                            Đóng
                         </Button>,
                         <Button key="submit" type="primary" loading={ModalUserInformation.loading} onClick={() => this.handleOk('ModalUserInformation')}>
-                            Save
+                            Đồng ý
                         </Button>
                     ]}
                 >
@@ -523,7 +732,7 @@ class ComponentPage extends Component {
                     onCancel={() => this.handleCancel('ModalHistory')}
                     footer={[
                         <Button key="back" onClick={() => this.handleCancel('ModalHistory')}>
-                            Close
+                            Đóng
                         </Button>
                     ]}
                 >
@@ -562,10 +771,10 @@ class ComponentPage extends Component {
                     onCancel={() => this.handleCancel('ModalPayment')}
                     footer={[
                         <Button key="back" onClick={() => this.handleCancel('ModalPayment')}>
-                            Cancel
+                            Đóng
                         </Button>,
                         <Button key="submit" type="primary" loading={ModalPayment.loading} onClick={() => this.handleOk('ModalPayment')}>
-                            Save
+                            Đồng ý
                         </Button>
                     ]}
                 >
