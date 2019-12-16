@@ -50,7 +50,7 @@ class ComponentPage extends Component {
         super(props)
         this.state = {
             user: {
-                role: 'Admin',
+                role: 'User',
                 name: 'Thái Nguyễn'
             },
             ModalAddCake: {
