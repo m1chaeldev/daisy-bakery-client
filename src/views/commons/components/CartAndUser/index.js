@@ -68,34 +68,6 @@ class ComponentPage extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            cart: [
-                {
-                    id: '1',
-                    cake_image: require('./../../images/bakery.png'),
-                    cake_name: 'Bánh mì Sandwich',
-                    cake_category: 'Bánh mì 1',
-                    cake_code: 'SW165',
-                    cake_price: '5000',
-                    cake_startedDate: new Date(2019, 9, 29),
-                    is_out_stock: false,
-                    amount: 1
-                },
-                {
-                    id: '2',
-                    cake_image: require('./../../images/bakery.png'),
-                    cake_name: 'Bánh mì Sandwich',
-                    cake_category: 'Bánh mì 1',
-                    cake_code: 'SW165',
-                    cake_price: '10000',
-                    cake_startedDate: new Date(2019, 9, 29),
-                    is_out_stock: false,
-                    amount: 1
-                },
-            ],
-            user: {
-                role: 'Admin',
-                name: 'Thái Nguyễn'
-            },
             ModalUserInformation: {
                 loading: false,
                 visible: false
@@ -119,6 +91,7 @@ class ComponentPage extends Component {
                 category_child: undefined,
                 category_child_name: ''
             },
+            cartUpdate: 0,
             width: 0,
             height: 0
         }
@@ -145,25 +118,29 @@ class ComponentPage extends Component {
     };
 
     updateCartAmount = (item, value) => {
-        const { cart } = this.state;
-        const index = cart.findIndex(obj => obj.cake_name === item.cake_name);
+        const { cart, updateUserCart } = this.props;
+        const { cartUpdate } = this.state;
+        const index = cart.findIndex(obj => obj.name === item.name);
         if (index !== -1) {
             let newData = cart;
             if (value === -1 && newData[index].amount === 0) newData[index].amount += 0;
             else newData[index].amount += value;
-            this.setState({ cart: newData });
+            updateUserCart(newData);
+            this.setState({ cartUpdate: cartUpdate + 1 })
         }
     };
 
     deleteCartItem = (item) => {
-        const { cart } = this.state;
-        const index = cart.findIndex(obj => obj.cake_name === item.cake_name);
+        const { cart, updateUserCart } = this.props;
+        const { cartUpdate } = this.state;
+        const index = cart.findIndex(obj => obj.name === item.name);
+        let newData = cart;
         if (index !== -1) {
-            let newData = cart;
+            message.warning(`Bạn đã xóa ${item.name} khỏi giỏ hàng`);
             newData.splice(index, 1);
-            this.setState({ cart: newData });
-            message.warning(`Bạn đã xóa ${item.cake_name} khỏi giỏ hàng`);
         }
+        updateUserCart(newData);
+        this.setState({ cartUpdate: cartUpdate + 1 });
     };
 
     handleClickOptionUserPopover = (path) => {
@@ -264,7 +241,7 @@ class ComponentPage extends Component {
     };
 
     userPopover = () => {
-        const { user } = this.state;
+        const { user } = this.props;
         return (
             <div style={{ width: 250 }}>
                 {user.name === '' ? (
@@ -299,11 +276,11 @@ class ComponentPage extends Component {
     };
 
     cartPopover = () => {
-        const { cart } = this.state;
+        const { cart } = this.props;
         return (
             <div style={{ width: 250 }}>
                 <div style={{ width: '100%', maxHeight: 230, overflowY: 'auto', overflowX: 'hidden' }}>
-                    {cart.length <= 0 ?
+                    {cart && cart.length <= 0 ?
                         <Empty description="Không có bánh trong giỏ hàng" /> :
                         <div style={{ width: '100%' }}>
                             {cart.map((item, index) => (
@@ -315,7 +292,7 @@ class ComponentPage extends Component {
                                     }}
                                 >
                                     <div style={{ width: 100, height: 56, position: 'relative' }}>
-                                        <img src={item.cake_image} alt="" style={{ width: '100%', height: '100%' }} />
+                                        <img src={item.image} alt="" style={{ width: '100%', height: '100%' }} />
                                         <div style={styles.deleteWrapper} onClick={() => this.deleteCartItem(item)}>
                                             <Icon
                                                 type="delete"
@@ -324,7 +301,7 @@ class ComponentPage extends Component {
                                         </div>
                                     </div>
                                     <div style={{ flex: 1, marginLeft: 5 }}>
-                                        <div style={styles.cartTitleText}>{item.cake_name}</div>
+                                        <div style={styles.cartTitleText}>{item.name}</div>
                                         <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
                                             <Button
                                                 size="small"
@@ -343,7 +320,7 @@ class ComponentPage extends Component {
                                                 position: 'absolute',
                                                 right: 0,
                                                 color: 'green'
-                                            }}>{numberWithCommas(Number(item.cake_price) * Number(item.amount))}đ</div>
+                                            }}>{numberWithCommas(Number(item.price) * Number(item.amount))}đ</div>
                                         </div>
                                     </div>
                                 </div>
@@ -369,17 +346,19 @@ class ComponentPage extends Component {
     };
 
     getTotalCost = () => {
-        const { cart } = this.state;
+        const { cart } = this.props;
         let result = 0;
         for (let index = 0; index < cart.length; index += 1) {
             const element = cart[index];
-            result += Number(element.amount) * Number(element.cake_price);
+            result += Number(element.amount) * Number(element.price);
         };
         return result;
     };
 
     searchCakes = (value) => {
-        message.success(`Bạn đang tìm bánh: ${value}`);
+        const { history } = this.props;
+        if (value.length < 1) history.push('/home');
+        else history.push(`/search/${value}`);
     };
 
     onChangeFormData = (value, key) => {
@@ -485,8 +464,6 @@ class ComponentPage extends Component {
     render() {
         const {
             width,
-            user,
-            cart,
             ModalHistory,
             ModalUserInformation,
             ModalPayment,
@@ -495,7 +472,9 @@ class ComponentPage extends Component {
             formData
         } = this.state;
         const {
-            categoryData
+            categoryData,
+            user,
+            cart
         } = this.props;
         return (
             <div style={styles.content}>
@@ -599,12 +578,14 @@ class ComponentPage extends Component {
                             <div style={styles.hMenuSmallText}>{shopPhone}</div>
                         </div>
                     )}
-                    <img
-                        alt=""
-                        src={settingsIcon}
-                        style={{ ...styles.cartIcon, marginRight: 10 }}
-                        onClick={() => this.showModal('ModalSettings')}
-                    />
+                    {user.level === 'Admin' && (
+                        <img
+                            alt=""
+                            src={settingsIcon}
+                            style={{ ...styles.cartIcon, marginRight: 10 }}
+                            onClick={() => this.showModal('ModalSettings')}
+                        />
+                    )}
                     <Popover
                         content={this.cartPopover()}
                         trigger="click"
@@ -620,7 +601,7 @@ class ComponentPage extends Component {
                                 src={cartIcon}
                                 style={{ ...styles.cartIcon }}
                             />
-                            {cart.length > 0 && (
+                            {cart && cart.length > 0 && (
                                 <div style={styles.badgeWrapper}>
                                     <div style={{ fontSize: '0.7rem', color: 'white' }}>
                                         {cart.length + 1 > 9 ? '9+' : cart.length}

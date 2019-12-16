@@ -49,10 +49,6 @@ class ComponentPage extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            user: {
-                role: 'User',
-                name: 'Thái Nguyễn'
-            },
             ModalAddCake: {
                 loading: false,
                 visible: false
@@ -103,18 +99,19 @@ class ComponentPage extends Component {
 
     handleClickBuyBakery = (item) => {
         if (item.is_out_stock) return message.error(`Bánh này hiện tại đã hết, vui lòng liên hệ ${shopPhone}`);
-        const { cart } = this.state;
-        const isExist = cart.findIndex(obj => obj.name === item.name);
+        const { cart, updateUserCart } = this.props;
+        const newCart = cart;
+        const isExist = newCart.findIndex(obj => obj.name === item.name);
         if (isExist === -1) {
-            let bakery = [...cart];
+            let bakery = [...newCart];
             const newItem = { ...item, amount: 1 };
             bakery.push(newItem);
-            this.setState({ cart: bakery });
+            updateUserCart(bakery);
             message.success(`Đã thêm "${item.name}" vào giỏ hàng`);
         } else {
-            let newData = cart;
+            let newData = newCart;
             newData[isExist].amount += 1;
-            this.setState({ cart: newData });
+            updateUserCart(newData);
         }
     };
 
@@ -207,8 +204,8 @@ class ComponentPage extends Component {
     };
 
     render() {
-        const { width, user, ModalAddCake, cakeImage, cakeCategoryEdit, loading, formData } = this.state;
-        const { categoryData } = this.props;
+        const { width, ModalAddCake, cakeImage, cakeCategoryEdit, loading, formData } = this.state;
+        const { categoryData, user } = this.props;
         const uploadButton = (
             <div>
                 <Icon type={this.state.loading ? 'loading' : 'plus'} />
@@ -227,9 +224,9 @@ class ComponentPage extends Component {
                                 <div style={styles.categoryTitleWrapper}>
                                     <div style={styles.categoryTitleText}>{category.name}</div>
                                 </div>
-                                <div style={styles.categoryOptionsWrapper}>
-                                    <div style={{ width: 1, height: 20 }}></div>
-                                    {user.role === 'Admin' && (
+                                {user.level === 'Admin' && (
+                                    <div style={styles.categoryOptionsWrapper}>
+                                        <div style={{ width: 1, height: 20 }}></div>
                                         <div style={styles.addCakeWrapper}>
                                             <Button
                                                 icon="plus"
@@ -239,8 +236,8 @@ class ComponentPage extends Component {
                                                 <span style={{ fontFamily: 'Montserrat, sans-serif' }}>Thêm bánh</span>
                                             </Button>
                                         </div>
-                                    )}
-                                </div>
+                                    </div>
+                                )}
                                 <div>
                                     <ListCakes
                                         data={this.getCakeData(category)}

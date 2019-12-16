@@ -13,10 +13,6 @@ class ComponentPage extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            cart: [],
-            user: {
-                role: 'Admin'
-            },
             width: 0,
             height: 0
         }

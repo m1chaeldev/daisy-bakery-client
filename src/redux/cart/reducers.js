@@ -7,10 +7,22 @@ const initialState = {
   cart: {
     data: undefined,
     isFetching: false
-  }
+  },
+  userCart: []
 };
 
 const reducer = [
+  {
+    on: Actions.updateUserCart,
+    handler: (state, action) => {
+      const data = action.payload;
+      return update(state, {
+        userCart: {
+          $set: data
+        }
+      });
+    }
+  },
   {
     on: Actions.getAllCartsRequest,
     handler: state =>

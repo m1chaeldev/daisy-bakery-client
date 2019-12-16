@@ -18,7 +18,6 @@ function* handleGetAllCarts(action) {
   }
 }
 
-
 function* watchGetAllCartsRequest() {
   yield takeLatest(Actions.getAllCartsRequest, handleGetAllCarts);
 }
@@ -26,6 +25,6 @@ function* watchGetAllCartsRequest() {
 export default function* rootSaga() {
   yield all([
     fork(watchGetAllCartsRequest),
-    // fork(watchLoginRequest)
+    // fork(watchUpdateUserCartRequest)
   ]);
 }

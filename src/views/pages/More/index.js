@@ -53,7 +53,14 @@ class ContainerPage extends Component {
 const mapActionToProps = {
   getAllCakesRequest: CakeActions.getAllCakesRequest,
   getAllCategoriesRequest: CategoryActions.getAllCategoriesRequest,
-  getAllCartsRequest: CartActions.getAllCartsRequest
+  getAllCartsRequest: CartActions.getAllCartsRequest,
+  createCategoryRequest: CategoryActions.createCategoryRequest,
+  createCategoryChildRequest: CategoryActions.createCategoryChildRequest,
+  updateCategoryRequest: CategoryActions.updateCategoryRequest,
+  updateCategoryChildRequest: CategoryActions.updateCategoryChildRequest,
+  deleteCategoryRequest: CategoryActions.deleteCategoryRequest,
+  deleteCategoryChildRequest: CategoryActions.deleteCategoryChildRequest,
+  updateUserCart: CartActions.updateUserCart
 };
 
 const mapStateToProps = state => {
@@ -63,7 +70,9 @@ const mapStateToProps = state => {
     categoryData: state.category.category,
     isFetchingCategory: state.category.category.isFetching,
     cartData: state.cart.cart.data,
-    isFetchingCart: state.cart.cart.isFetching
+    isFetchingCart: state.cart.cart.isFetching,
+    cart: state.cart.userCart,
+    user: state.account.user.data,
   };
 };
 

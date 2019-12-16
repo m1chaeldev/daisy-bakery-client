@@ -112,51 +112,11 @@ class ComponentPage extends Component {
         return false;
     };
 
-    getCakeData = (category) => {
-        const { cakeData } = this.props;
-        let data = cakeData ? cakeData.filter(obj => obj.category === category._id) : [];
-        return data;
-    };
-
-    getDropdownOptions = (category) => {
-        const { categoryData } = this.props;
-        const { child } = categoryData;
-        const childList = child ? child.filter(obj => obj.category === category._id) : [];
-        return (
-            <Select
-                style={{ width: 150 }}
-                defaultValue=""
-                onChange={this.handleCategorySelectChange}
-            >
-                <Option value="">Tất cả</Option>
-                {childList.map(item => (
-                    <Option key={item._id} value={item._id}>{item.name}</Option>
-                ))}
-            </Select>
-        );
-    };
-
-    handleCategorySelectChange = (value) => {
-        const { cakeData } = this.props;
-        const { category } = this.props.match.params;
-        let data = cakeData ? cakeData.filter(obj => obj.category_child.includes(value) && obj.category.includes(category)) : [];
-        this.setState({ cakeData: data });
-    };
-
-    getFirstData = () => {
-        const { categoryData } = this.props;
-        const { category } = this.props.match.params;
-        const categoryList = categoryData && categoryData.data ? categoryData.data.filter(obj => obj._id === category) : [];
-        const data = categoryList && categoryList[0] ? this.getCakeData(categoryList[0]) : [];
-        return data;
-    };
-
     render() {
-        const { width, cakeData } = this.state;
-        const { user, categoryData } = this.props;
-        const { category } = this.props.match.params;
-        const categoryList = categoryData && categoryData.data ? categoryData.data.filter(obj => obj._id === category) : [];
-        console.log(cakeData, '123123');
+        const { width } = this.state;
+        const { user, cakeData } = this.props;
+        const { key } = this.props.match.params;
+        const cakeList = cakeData ? cakeData.filter(obj => obj.name.toLowerCase().includes(key.toLowerCase())) : [];
         return (
             <div style={styles.container}>
                 <Header handleClickLogo={() => this.handleClickHMenuIcon('/home')} />
@@ -166,14 +126,13 @@ class ComponentPage extends Component {
                     <Col xs={22} sm={22} md={18} lg={16} xl={16} style={{ marginBottom: 20 }}>
                         <div style={styles.eachCategory}>
                             <div style={styles.categoryTitleWrapper}>
-                                <div style={styles.categoryTitleText}>{categoryList && categoryList[0] ? categoryList[0].name : ''}</div>
+                                <div style={styles.categoryTitleText}>{`Tìm kiếm: "${key}"`}</div>
                             </div>
                             <div style={styles.categoryOptionsWrapper}>
-                                {this.getDropdownOptions(categoryList && categoryList[0] ? categoryList[0] : {})}
                             </div>
                             <div>
                                 <ListCakes
-                                    data={cakeData === null ? this.getFirstData() : cakeData}
+                                    data={cakeList.length > 0 ? cakeList : []}
                                     user={user}
                                     handleClickBuyBakery={this.handleClickBuyBakery}
                                     handleClickEdit={this.handleClickEdit}

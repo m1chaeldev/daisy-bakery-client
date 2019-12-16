@@ -5,18 +5,22 @@ import { createBrowserHistory } from 'history'
 // import AuthorizedRoute from '../components/Authorized'
 import Home from "../views/pages/Home";
 import NotFound from "../views/pages/NotFound";
+import More from "../views/pages/More";
+import Search from "../views/pages/Search";
 
 class RouterConfig extends PureComponent {
   render() {
     return (
       <BrowserRouter history={createBrowserHistory}>
         <Switch>
-            <Route exact path="/" component={Home} />
-            <Route exact path="/home" component={Home} />
-            <Route exact path="/index" component={Home} />
-            <Route path="*" component={NotFound} />
+          <Route exact path="/" component={Home} />
+          <Route exact path="/home" component={Home} />
+          <Route exact path="/index" component={Home} />
+          <Route exact path="/more/:category" component={More} />
+          <Route exact path="/search/:key" component={Search} />
+          <Route path="*" component={NotFound} />
 
-            {/* <Route path="/blocks" component={ExploreBlocks} />
+          {/* <Route path="/blocks" component={ExploreBlocks} />
             <Route path="/rich-list" component={ExploreRichList} />
             <Route path="/address-detail" component={AddressDetail} />
             <Route path="/address/:address" component={ExploreAddress} />

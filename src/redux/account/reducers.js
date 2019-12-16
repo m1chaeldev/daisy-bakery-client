@@ -6,7 +6,10 @@ import { createReducer } from '../../utils/redux';
 const initialState = {
   user: {
     token: undefined,
-    data: undefined,
+    data: {
+      name: 'Thái Nguyễn',
+      level: 'Admin'
+    },
     status: false
   },
   login: {
