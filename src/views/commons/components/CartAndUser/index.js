@@ -112,7 +112,7 @@ class ComponentPage extends Component {
                 loading: false,
                 visible: false
             },
-            addToCategory: 1,
+            addToCategory: 2,
             formData: {
                 category: '',
                 category_name: '',
@@ -200,8 +200,8 @@ class ComponentPage extends Component {
             let newData = ModalSettings;
             newData.visible = true;
             let stateData = formData;
-            stateData.category = categoryData && categoryData.data ? categoryData.data[0]._id : '';
-            stateData.category_name = categoryData && categoryData.data ? categoryData.data[0].name : '';
+            stateData.category = undefined;
+            stateData.category_name = '';
             const categoryChild = stateData.category !== '' ? this.getChildCategoriesById(stateData.category) : '';
             stateData.category_child = categoryChild.length > 0 ? categoryChild[0]._id : undefined;
             stateData.category_child_name = categoryChild.length > 0 ? categoryChild[0].name : '';
@@ -225,8 +225,8 @@ class ComponentPage extends Component {
         }, 3000);
     };
 
-    handleCancel = (state) => {
-        const { ModalHistory, ModalUserInformation, ModalPayment, ModalSettings } = this.state;
+    hideModal = (state) => {
+        const { ModalHistory, ModalUserInformation, ModalPayment, ModalSettings, formData } = this.state;
         if (state === 'ModalUserInformation') {
             let newData = ModalUserInformation;
             newData.visible = false;
@@ -249,9 +249,15 @@ class ComponentPage extends Component {
             });
         }
         if (state === 'ModalSettings') {
+            const newState = formData;
+            newState.category = undefined;
+            newState.category_child = undefined;
+            newState.category_name = '';
+            newState.category_child_name = '';
             let newData = ModalSettings;
             newData.visible = false;
             this.setState({
+                formData: newState,
                 [state]: newData,
             });
         }
@@ -390,16 +396,90 @@ class ComponentPage extends Component {
         const child = category.props.category;
         if (key === 'category') {
             newData.category_name = child.name;
-            const categoryChildOfCategory = this.getChildCategoriesById(child._id);
-            newData.category_child = categoryChildOfCategory && categoryChildOfCategory[0] && categoryChildOfCategory[0]._id ?
-                categoryChildOfCategory[0]._id : undefined;
-            newData.category_child_name = categoryChildOfCategory && categoryChildOfCategory[0] && categoryChildOfCategory[0].name ?
-                categoryChildOfCategory[0].name : '';
+            newData.category_child = undefined;
         }
         if (key === 'category_child') {
             newData.category_child_name = child.name;
         }
         this.setState({ formData: newData });
+    };
+
+    handleCreateCategory = (data, id) => {
+        const {
+            createCategoryRequest,
+            createCategoryChildRequest
+        } = this.props;
+        if (id === 1) {
+            if (data.category_name.length <= 3)
+                return alert('Tên danh mục phải có ít nhất 3 kí tự');
+            createCategoryRequest({
+                name: data.category_name,
+                serverKey: 'tuoilzphaduoctao123'
+            });
+        }
+        else {
+            if (data.category_child_name.length <= 3)
+                return alert('Tên danh mục con phải có ít nhất 3 kí tự');
+            createCategoryChildRequest({
+                category: data.category,
+                name: data.category_child_name,
+                serverKey: 'tuoilzphaduoctao123'
+            });
+        }
+        this.hideModal('ModalSettings');
+    };
+
+    handleUpdateCategory = (data, id) => {
+        const {
+            updateCategoryRequest,
+            updateCategoryChildRequest,
+            // deleteCategoryRequest,
+            // deleteCategoryChildRequest
+        } = this.props;
+        if (id === 1) {
+            if (data.category_name.length <= 3)
+                return alert('Tên danh mục phải có ít nhất 3 kí tự');
+            updateCategoryRequest({
+                id: data.category,
+                name: data.category_name,
+                serverKey: 'tuoilzphaduoctao123'
+            });
+        }
+        else {
+            if (data.category_child_name.length <= 3)
+                return alert('Tên danh mục con phải có ít nhất 3 kí tự');
+            updateCategoryChildRequest({
+                id: data.category_child,
+                category: data.category,
+                name: data.category_child_name,
+                serverKey: 'tuoilzphaduoctao123'
+            });
+        }
+        this.hideModal('ModalSettings');
+    };
+
+    handleDeleteCategory = (data, id) => {
+        const {
+            deleteCategoryRequest,
+            deleteCategoryChildRequest
+        } = this.props;
+        if (id === 1) {
+            if (window.confirm("Dữ liệu sẽ biến mất vĩnh viễn nếu bạn xóa")) {
+                deleteCategoryRequest({
+                    id: data.category,
+                    serverKey: 'tuoilzphaduoctao123'
+                });
+            }
+        }
+        else {
+            if (window.confirm("Dữ liệu sẽ biến mất vĩnh viễn nếu bạn xóa")) {
+                deleteCategoryChildRequest({
+                    id: data.category_child,
+                    serverKey: 'tuoilzphaduoctao123'
+                });
+            }
+        }
+        this.hideModal('ModalSettings');
     };
 
     render() {
@@ -580,9 +660,9 @@ class ComponentPage extends Component {
                     title="Thiết lập"
                     zIndex={10000}
                     onOk={() => this.handleOk('ModalSettings')}
-                    onCancel={() => this.handleCancel('ModalSettings')}
+                    onCancel={() => this.hideModal('ModalSettings')}
                     footer={[
-                        <Button key="back" onClick={() => this.handleCancel('ModalSettings')}>
+                        <Button key="back" onClick={() => this.hideModal('ModalSettings')}>
                             Đóng
                         </Button>,
                         // <Button key="submit" type="primary" loading={ModalSettings.loading} onClick={() => this.handleOk('ModalSettings')}>
@@ -590,21 +670,13 @@ class ComponentPage extends Component {
                         // </Button>
                     ]}
                 >
-                    <Button
-                        type={addToCategory === 1 ? 'primary' : 'default'}
-                        onClick={() => this.setState({ addToCategory: 1 })}
-                    >Tạo mới</Button>
-                    <Button
-                        type={addToCategory === 2 ? 'primary' : 'default'}
-                        style={{ marginLeft: 10 }}
-                        onClick={() => this.setState({ addToCategory: 2 })}
-                    >Sửa hoặc xóa</Button>
-                    <div style={{ marginTop: 20 }}>
+                    <div>
                         {addToCategory === 2 && (
                             <div>
                                 <div style={{ fontSize: '0.9rem', marginBottom: 5 }}>Danh mục</div>
                                 <Select
                                     value={formData.category}
+                                    placeholder="Chọn một danh mục"
                                     style={{ width: '100%', marginBottom: 5 }}
                                     dropdownStyle={{ zIndex: 99999999999 }}
                                     onChange={(value, category) => this.onChangeFormDataForEdit(value, category, 'category')}
@@ -626,20 +698,27 @@ class ComponentPage extends Component {
                                 <div style={{ marginBottom: 20 }}>
                                     <Button
                                         type="primary"
-                                        style={{ marginRight: 20, width: 120 }}
-                                        onClick={null}
+                                        style={{ marginRight: 20 }}
+                                        onClick={() => this.handleCreateCategory(formData, 1)}
+                                    >Thêm</Button>
+                                    <Button
+                                        type="primary"
+                                        style={{ marginRight: 20 }}
+                                        onClick={() => this.handleUpdateCategory(formData, 1)}
+                                        disabled={formData.category !== undefined ? false : true}
                                     >Sửa</Button>
                                     <Button
                                         type="danger"
-                                        style={{ width: 120 }}
-                                        onClick={null}
+                                        onClick={() => this.handleDeleteCategory(formData, 1)}
+                                        disabled={formData.category !== undefined ? false : true}
                                     >Xóa</Button>
                                 </div>
                                 <div style={{ fontSize: '0.9rem', marginBottom: 5 }}>Danh mục con</div>
                                 <Select
                                     value={formData.category_child}
                                     style={{ width: '100%', marginBottom: 5 }}
-                                    placeholder="Chọn một danh mục con"
+                                    disabled={formData.category !== undefined ? false : true}
+                                    placeholder={formData.category !== undefined ? 'Chọn một danh mục con' : 'Chọn một danh mục'}
                                     dropdownStyle={{ zIndex: 99999999999 }}
                                     onChange={(value, category) => this.onChangeFormDataForEdit(value, category, 'category_child')}
                                 >
@@ -655,49 +734,28 @@ class ComponentPage extends Component {
                                 <Input
                                     style={{ marginBottom: 10 }}
                                     value={formData.category_child_name}
-                                    placeholder="Chọn một danh mục con"
-                                    disabled={formData.category_child_name !== '' ? false : true}
+                                    placeholder={formData.category !== undefined ? 'Chọn hoặc gõ tên một danh mục con' : 'Chọn một danh mục'}
                                     onChange={e => this.onChangeFormData(e.target.value, 'category_child_name')}
+                                    disabled={formData.category !== undefined ? false : true}
                                 />
                                 <div style={{ marginBottom: 20 }}>
                                     <Button
                                         type="primary"
-                                        style={{ marginRight: 20, width: 120 }}
-                                        onClick={null}
+                                        style={{ marginRight: 20 }}
+                                        onClick={() => this.handleCreateCategory(formData, 2)}
+                                    >Thêm</Button>
+                                    <Button
+                                        type="primary"
+                                        style={{ marginRight: 20 }}
+                                        onClick={() => this.handleUpdateCategory(formData, 2)}
+                                        disabled={formData.category_child !== undefined ? false : true}
                                     >Sửa</Button>
                                     <Button
                                         type="danger"
-                                        style={{ width: 120 }}
-                                        onClick={null}
+                                        onClick={() => this.handleDeleteCategory(formData, 2)}
+                                        disabled={formData.category_child !== undefined ? false : true}
                                     >Xóa</Button>
                                 </div>
-                            </div>
-                        )}
-                        {addToCategory === 1 && (
-                            <div>
-                                <div style={{ fontSize: '0.9rem', marginBottom: 5 }}>Tên danh mục</div>
-                                <Input
-                                    style={{ marginBottom: 10 }}
-                                    value={formData.create_category_name}
-                                    placeholder="Nhập tên danh mục mới"
-                                    onChange={e => this.onChangeFormData(e.target.value, 'create_category_name')}
-                                />
-                                <Button
-                                    type="primary"
-                                    style={{ width: 120, marginBottom: 20 }}
-                                    onClick={null}
-                                >Thêm</Button>
-                                <div style={{ fontSize: '0.9rem', marginBottom: 5 }}>Tên danh mục con</div>
-                                <Input
-                                    style={{ marginBottom: 10 }}
-                                    value={formData.create_category_child_name}
-                                    placeholder="Nhập tên danh mục con mới"
-                                    onChange={e => this.onChangeFormData(e.target.value, 'create_category_child_name')}
-                                />
-                                <Button
-                                    type="primary"
-                                    style={{ width: 120 }}
-                                >Thêm</Button>
                             </div>
                         )}
                     </div>
@@ -707,9 +765,9 @@ class ComponentPage extends Component {
                     title="Thông tin tài khoản"
                     zIndex={10000}
                     onOk={() => this.handleOk('ModalUserInformation')}
-                    onCancel={() => this.handleCancel('ModalUserInformation')}
+                    onCancel={() => this.hideModal('ModalUserInformation')}
                     footer={[
-                        <Button key="back" onClick={() => this.handleCancel('ModalUserInformation')}>
+                        <Button key="back" onClick={() => this.hideModal('ModalUserInformation')}>
                             Đóng
                         </Button>,
                         <Button key="submit" type="primary" loading={ModalUserInformation.loading} onClick={() => this.handleOk('ModalUserInformation')}>
@@ -729,9 +787,9 @@ class ComponentPage extends Component {
                     title="Lịch sử"
                     zIndex={10000}
                     onOk={() => this.handleOk('ModalHistory')}
-                    onCancel={() => this.handleCancel('ModalHistory')}
+                    onCancel={() => this.hideModal('ModalHistory')}
                     footer={[
-                        <Button key="back" onClick={() => this.handleCancel('ModalHistory')}>
+                        <Button key="back" onClick={() => this.hideModal('ModalHistory')}>
                             Đóng
                         </Button>
                     ]}
@@ -768,9 +826,9 @@ class ComponentPage extends Component {
                     title="Thanh toán đơn hàng"
                     zIndex={10000}
                     onOk={() => this.handleOk('ModalPayment')}
-                    onCancel={() => this.handleCancel('ModalPayment')}
+                    onCancel={() => this.hideModal('ModalPayment')}
                     footer={[
-                        <Button key="back" onClick={() => this.handleCancel('ModalPayment')}>
+                        <Button key="back" onClick={() => this.hideModal('ModalPayment')}>
                             Đóng
                         </Button>,
                         <Button key="submit" type="primary" loading={ModalPayment.loading} onClick={() => this.handleOk('ModalPayment')}>

@@ -1,4 +1,4 @@
-const API_URL = 'http://192.168.100.15:4000/api/v1';
+const API_URL = 'http://localhost:4000/api/v1';
 
 async function request(path, method, payload = {}) {
   try {
@@ -16,7 +16,7 @@ async function request(path, method, payload = {}) {
       Object.keys(payload).forEach(key =>
         url.searchParams.append(key, payload[key])
       );
-    if (method === 'POST' || method === 'PUT')
+    if (method === 'POST' || method === 'PUT' || method === 'DELETE')
       options.body = JSON.stringify(payload);
 
     const res = await fetch(url, options);
@@ -43,7 +43,7 @@ const restful = {
   GET: (path, params) => request(path, 'GET', params),
   POST: (path, body) => request(path, 'POST', body),
   PUT: (path, body) => request(path, 'PUT', body),
-  DELETE: path => request(path, 'DELETE')
+  DELETE: (path, body) => request(path, 'DELETE', body)
 };
 
 export default restful;

@@ -53,7 +53,13 @@ class ContainerPage extends Component {
 const mapActionToProps = {
   getAllCakesRequest: CakeActions.getAllCakesRequest,
   getAllCategoriesRequest: CategoryActions.getAllCategoriesRequest,
-  getAllCartsRequest: CartActions.getAllCartsRequest
+  getAllCartsRequest: CartActions.getAllCartsRequest,
+  createCategoryRequest: CategoryActions.createCategoryRequest,
+  createCategoryChildRequest: CategoryActions.createCategoryChildRequest,
+  updateCategoryRequest: CategoryActions.updateCategoryRequest,
+  updateCategoryChildRequest: CategoryActions.updateCategoryChildRequest,
+  deleteCategoryRequest: CategoryActions.deleteCategoryRequest,
+  deleteCategoryChildRequest: CategoryActions.deleteCategoryChildRequest
 };
 
 const mapStateToProps = state => {
