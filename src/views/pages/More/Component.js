@@ -287,7 +287,7 @@ class ComponentPage extends Component {
                 <Header handleClickLogo={() => this.handleClickHMenuIcon('/home')} />
                 <Slider />
                 <div style={styles.content}>
-                    <CartAndUser {...this.props} />
+                    <CartAndUser />
                     <Col xs={22} sm={22} md={18} lg={16} xl={16} style={{ marginBottom: 20 }}>
                         <div style={styles.eachCategory}>
                             <div style={styles.categoryTitleWrapper}>

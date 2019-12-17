@@ -9,7 +9,25 @@ const {
     getAllCartsFailure
 } = createAsyncAction('getAllCarts', CONSTANTS.GET_ALL_CARTS);
 
+const {
+    createOrderRequest,
+    createOrderSuccess,
+    createOrderFailure
+} = createAsyncAction('createOrder', CONSTANTS.CREATE_ORDER);
+
+const {
+    updateOrderStatusRequest,
+    updateOrderStatusSuccess,
+    updateOrderStatusFailure
+} = createAsyncAction('updateOrderStatus', CONSTANTS.UPDATE_ORDER_STATUS);
+
 export default {
+    updateOrderStatusRequest,
+    updateOrderStatusSuccess,
+    updateOrderStatusFailure,
+    createOrderRequest,
+    createOrderSuccess,
+    createOrderFailure,
     updateUserCart,
     getAllCartsRequest,
     getAllCartsSuccess,

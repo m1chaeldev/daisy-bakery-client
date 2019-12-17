@@ -1,11 +1,19 @@
 import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
+import { connect } from "react-redux";
 import { Input, Empty, Col, message, Popover, Button, Icon, Modal, Card, Select } from 'antd';
+import FacebookLogin from 'react-facebook-login/dist/facebook-login-render-props';
+import CakeActions from "../../../../redux/cake/actions";
+import CategoryActions from "../../../../redux/category/actions";
+import CartActions from "../../../../redux/cart/actions";
+import AccountActions from "../../../../redux/account/actions";
 // import LoadingIcon from './../../commons/components/LoadingIcon';
 
 // Styles
 import styles from './styles';
 import './styles.css';
 
+const moment = require('moment');
 const { Option } = Select;
 const { Search } = Input;
 const { TextArea } = Input;
@@ -25,6 +33,7 @@ const gmailIcon = require('./../../images/icons/gmail.png');
 const userIcon = require('./../../images/icons/user.png');
 const cartIcon = require('./../../images/icons/cart.png');
 const settingsIcon = require('./../../images/icons/settings.png');
+const listIcon = require('./../../images/icons/list.png');
 
 const hMenu = [
     {
@@ -84,6 +93,10 @@ class ComponentPage extends Component {
                 loading: false,
                 visible: false
             },
+            ModalConfirmOrder: {
+                loading: false,
+                visible: false
+            },
             addToCategory: 2,
             formData: {
                 category: '',
@@ -91,6 +104,24 @@ class ComponentPage extends Component {
                 category_child: undefined,
                 category_child_name: ''
             },
+            userFormData: {
+                _id: '',
+                id: '',
+                name: '',
+                phone: '',
+                address: ''
+            },
+            paymentFormData: {
+                _id: '',
+                owner: '',
+                name: '',
+                phone: '',
+                address: '',
+                note: '',
+                cart: ''
+            },
+            confirmOrderType: 0,
+            blockReason: '',
             cartUpdate: 0,
             width: 0,
             height: 0
@@ -144,18 +175,33 @@ class ComponentPage extends Component {
     };
 
     handleClickOptionUserPopover = (path) => {
-        // const { history } = this.props;
-        if (path === 'logout') alert('Logout')
+        const { logoutRequest } = this.props;
+        if (path === 'logout') logoutRequest();
         else this.showModal(path);
     };
 
     showModal = (state) => {
-        const { ModalHistory, ModalUserInformation, ModalPayment, ModalSettings, formData } = this.state;
-        const { categoryData } = this.props;
+        const { ModalHistory,
+            ModalUserInformation,
+            ModalPayment,
+            ModalSettings,
+            formData,
+            userFormData,
+            paymentFormData,
+            ModalConfirmOrder
+        } = this.state;
+        const { user } = this.props;
         if (state === 'ModalUserInformation') {
             let newData = ModalUserInformation;
             newData.visible = true;
+            let userNewData = userFormData;
+            userNewData._id = user._id;
+            userNewData.id = user.id;
+            userNewData.name = user.name;
+            userNewData.phone = user.phone;
+            userNewData.address = user.address;
             this.setState({
+                userFormData: userNewData,
                 [state]: newData,
             });
         }
@@ -166,10 +212,25 @@ class ComponentPage extends Component {
                 [state]: newData,
             });
         }
-        if (state === 'ModalPayment') {
-            let newData = ModalPayment;
+        if (state === 'ModalConfirmOrder') {
+            let newData = ModalConfirmOrder;
             newData.visible = true;
             this.setState({
+                [state]: newData,
+            });
+        }
+        if (state === 'ModalPayment') {
+            if (user.is_block) return alert(`Bạn đã bị chặn vì lý do: ${user.block_reason}. Vui lòng liên hệ nhân viên để biết thêm thông tin`);
+            let newData = ModalPayment;
+            newData.visible = true;
+            let paymentNewData = paymentFormData;
+            paymentNewData._id = user._id;
+            paymentNewData.owner = user.id.length > 0 ? user.id : 'Khách vãng lai';
+            paymentNewData.name = user.name;
+            paymentNewData.phone = user.phone;
+            paymentNewData.address = user.address;
+            this.setState({
+                paymentFormData: paymentNewData,
                 [state]: newData,
             });
         }
@@ -195,15 +256,14 @@ class ComponentPage extends Component {
         return child;
     };
 
-    handleOk = (state) => {
-        this.setState({ loading: true });
-        setTimeout(() => {
-            this.setState({ loading: false, visible: false });
-        }, 3000);
-    };
-
     hideModal = (state) => {
-        const { ModalHistory, ModalUserInformation, ModalPayment, ModalSettings, formData } = this.state;
+        const { ModalHistory,
+            ModalUserInformation,
+            ModalPayment,
+            ModalSettings,
+            formData,
+            ModalConfirmOrder
+        } = this.state;
         if (state === 'ModalUserInformation') {
             let newData = ModalUserInformation;
             newData.visible = false;
@@ -213,6 +273,13 @@ class ComponentPage extends Component {
         }
         if (state === 'ModalHistory') {
             let newData = ModalHistory;
+            newData.visible = false;
+            this.setState({
+                [state]: newData,
+            });
+        }
+        if (state === 'ModalConfirmOrder') {
+            let newData = ModalConfirmOrder;
             newData.visible = false;
             this.setState({
                 [state]: newData,
@@ -240,19 +307,40 @@ class ComponentPage extends Component {
         }
     };
 
+    responseFacebook = (res) => {
+        if (res.userID.length > 1 && res.name.length > 1) {
+            const { getUserRequest } = this.props;
+            getUserRequest({
+                id: res.userID,
+                name: res.name,
+                serverKey: 'tuoilzphaduoctao123'
+            });
+        }
+    };
+
     userPopover = () => {
         const { user } = this.props;
         return (
             <div style={{ width: 250 }}>
                 {user.name === '' ? (
-                    <button style={styles.facebookLoginBtn}>
-                        <img
-                            src={facebookIcon}
-                            alt=""
-                            style={styles.facebookLoginIcon}
-                        />
-                        <div style={styles.facebookLoginText}>Đăng nhập facebook</div>
-                    </button>
+                    <FacebookLogin
+                        appId="547549069433611"
+                        fields="name,email,picture"
+                        callback={this.responseFacebook}
+                        render={renderProps => (
+                            <button
+                                onClick={renderProps.onClick}
+                                style={styles.facebookLoginBtn}
+                            >
+                                <img
+                                    src={facebookIcon}
+                                    alt=""
+                                    style={styles.facebookLoginIcon}
+                                />
+                                <div style={styles.facebookLoginText}>Đăng nhập facebook</div>
+                            </button>
+                        )}
+                    />
                 ) : (
                         <div style={{ width: '100%' }}>
                             {userPopoverOptions.map((item, index) => (
@@ -368,6 +456,20 @@ class ComponentPage extends Component {
         this.setState({ formData: newData });
     };
 
+    onChangeFormDataForUser = (value, key) => {
+        const { userFormData } = this.state;
+        let newData = userFormData;
+        newData[key] = value;
+        this.setState({ userFormData: newData });
+    };
+
+    onChangeFormDataForPayment = (value, key) => {
+        const { paymentFormData } = this.state;
+        let newData = paymentFormData;
+        newData[key] = value;
+        this.setState({ paymentFormData: newData });
+    };
+
     onChangeFormDataForEdit = (value, category, key) => {
         const { formData } = this.state;
         let newData = formData;
@@ -461,6 +563,61 @@ class ComponentPage extends Component {
         this.hideModal('ModalSettings');
     };
 
+    handleEditUserInformation = () => {
+        const { userFormData } = this.state;
+        const { updateUserRequest } = this.props;
+        if (userFormData.name.length < 1) return alert('Họ và tên không được bỏ trống');
+        updateUserRequest({ ...userFormData, serverKey: 'tuoilzphaduoctao123' });
+        this.hideModal('ModalUserInformation');
+    };
+
+    handlePayment = () => {
+        const { paymentFormData } = this.state;
+        const { createOrderRequest, cart, updateUserCart } = this.props;
+        if (paymentFormData.name.length < 1 && paymentFormData.phone.length < 1 && paymentFormData.address.length < 1)
+            return alert('Vui lòng nhập đầy đủ họ và tên người đặt, số điện thoại và địa chỉ');
+        const newData = paymentFormData;
+        newData.cart = JSON.stringify(cart);
+        newData.total_price = `${this.getTotalCost()}`;
+        createOrderRequest({ ...newData, serverKey: 'tuoilzphaduoctao123' });
+        updateUserCart([]);
+        this.hideModal('ModalPayment');
+    };
+
+    getHistoryOrderOfUser = () => {
+        const { user, cartData } = this.props;
+        const data = cartData ? cartData.filter(obj => obj.owner === user.id) : [];
+        return data;
+    };
+
+    getConfirmOrderData = (id) => {
+        const { cartData } = this.props;
+        const data = cartData ? cartData.filter(obj => obj.status === id) : [];
+        return data;
+    };
+
+    updateOrderStatus = (item, value) => {
+        const { updateOrderStatusRequest } = this.props;
+        updateOrderStatusRequest({
+            id: item._id,
+            status: value,
+            serverKey: 'tuoilzphaduoctao123'
+        });
+    };
+
+    blockUser = item => {
+        const { blockUserRequest } = this.props;
+        const { blockReason } = this.state;
+        if (window.confirm(`Chặn khách hàng ${item.name}?`)) {
+            blockUserRequest({
+                id: item.owner,
+                is_block: true,
+                block_reason: blockReason.length > 0 ? blockReason : '',
+                serverKey: 'tuoilzphaduoctao123'
+            });
+        }
+    };
+
     render() {
         const {
             width,
@@ -469,13 +626,19 @@ class ComponentPage extends Component {
             ModalPayment,
             ModalSettings,
             addToCategory,
-            formData
+            formData,
+            userFormData,
+            paymentFormData,
+            ModalConfirmOrder,
+            confirmOrderType
         } = this.state;
         const {
             categoryData,
             user,
             cart
         } = this.props;
+        const historyData = this.getHistoryOrderOfUser();
+        const confirmOrderData = this.getConfirmOrderData(confirmOrderType);
         return (
             <div style={styles.content}>
                 <Col xs={22} sm={22} md={18} lg={16} xl={16}
@@ -581,6 +744,14 @@ class ComponentPage extends Component {
                     {user.level === 'Admin' && (
                         <img
                             alt=""
+                            src={listIcon}
+                            style={{ ...styles.cartIcon, marginRight: 10 }}
+                            onClick={() => this.showModal('ModalConfirmOrder')}
+                        />
+                    )}
+                    {user.level === 'Admin' && (
+                        <img
+                            alt=""
                             src={settingsIcon}
                             style={{ ...styles.cartIcon, marginRight: 10 }}
                             onClick={() => this.showModal('ModalSettings')}
@@ -640,15 +811,12 @@ class ComponentPage extends Component {
                     visible={ModalSettings.visible}
                     title="Thiết lập"
                     zIndex={10000}
-                    onOk={() => this.handleOk('ModalSettings')}
+                    onOk={null}
                     onCancel={() => this.hideModal('ModalSettings')}
                     footer={[
                         <Button key="back" onClick={() => this.hideModal('ModalSettings')}>
                             Đóng
-                        </Button>,
-                        // <Button key="submit" type="primary" loading={ModalSettings.loading} onClick={() => this.handleOk('ModalSettings')}>
-                        //     Đồng ý
-                        // </Button>
+                        </Button>
                     ]}
                 >
                     <div>
@@ -745,29 +913,44 @@ class ComponentPage extends Component {
                     visible={ModalUserInformation.visible}
                     title="Thông tin tài khoản"
                     zIndex={10000}
-                    onOk={() => this.handleOk('ModalUserInformation')}
+                    onOk={this.handleEditUserInformation}
                     onCancel={() => this.hideModal('ModalUserInformation')}
                     footer={[
                         <Button key="back" onClick={() => this.hideModal('ModalUserInformation')}>
                             Đóng
                         </Button>,
-                        <Button key="submit" type="primary" loading={ModalUserInformation.loading} onClick={() => this.handleOk('ModalUserInformation')}>
+                        <Button key="submit" type="primary" loading={ModalUserInformation.loading} onClick={this.handleEditUserInformation}>
                             Đồng ý
                         </Button>
                     ]}
                 >
                     <div style={{ fontSize: '0.9rem', marginBottom: 5 }}>Họ và tên</div>
-                    <Input style={{ marginBottom: 10 }} onChange={e => this.onChange(e, 'fullName')} />
+                    <Input
+                        style={{ marginBottom: 10, color: 'black' }}
+                        placeholder="Nhập họ và tên"
+                        onChange={e => this.onChangeFormDataForUser(e.target.value, 'name')}
+                        value={userFormData.name}
+                    />
                     <div style={{ fontSize: '0.9rem', marginBottom: 5 }}>Số điện thoại</div>
-                    <Input style={{ marginBottom: 10 }} onChange={e => this.onChange(e, 'phoneNumber')} />
+                    <Input
+                        style={{ marginBottom: 10, color: 'black' }}
+                        placeholder="Nhập số điện thoại"
+                        onChange={e => this.onChangeFormDataForUser(e.target.value, 'phone')}
+                        value={userFormData.phone}
+                    />
                     <div style={{ fontSize: '0.9rem', marginBottom: 5 }}>Địa chỉ</div>
-                    <TextArea onChange={e => this.onChange(e, 'address')} />
+                    <TextArea
+                        style={{ color: 'black' }}
+                        placeholder="Nhập địa chỉ"
+                        onChange={e => this.onChangeFormDataForUser(e.target.value, 'address')}
+                        value={userFormData.address}
+                    />
                 </Modal>
                 <Modal
                     visible={ModalHistory.visible}
                     title="Lịch sử"
                     zIndex={10000}
-                    onOk={() => this.handleOk('ModalHistory')}
+                    onOk={null}
                     onCancel={() => this.hideModal('ModalHistory')}
                     footer={[
                         <Button key="back" onClick={() => this.hideModal('ModalHistory')}>
@@ -775,59 +958,160 @@ class ComponentPage extends Component {
                         </Button>
                     ]}
                 >
-                    <div style={{ width: '100%', maxHeight: 240, overflowX: 'hidden', overflowY: 'scroll' }}>
-                        {[1, 2, 3].map((item, index) =>
+                    <div style={{ width: '100%', paddingRight: 20, maxHeight: 350, overflowX: 'hidden', overflowY: 'scroll' }}>
+                        {historyData && historyData.length > 0 ? historyData.map((item, index) =>
                             <Card
                                 key={index.toString()}
                                 size="small"
-                                title="30/11/2019"
+                                title={moment(item.order_date).format('DD/MM/YYYY HH:mm')}
                                 style={{
                                     width: '100%',
                                     marginTop: index === 0 ? 0 : 10
                                 }}
                             >
                                 <div>
-                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        <div style={{ marginRight: 5 }}>-</div>
-                                        <div style={{ marginRight: 5, fontWeight: 'bold' }}>Bánh mì ABC</div>
-                                        <div>x5</div>
-                                        <div style={{ marginLeft: 5 }}>(50.000đ)</div>
-                                    </div>
+                                    {JSON.parse(item.cart).map(order => (
+                                        <div key={order._id} style={{ display: 'flex', alignItems: 'center' }}>
+                                            <div style={{ marginRight: 5 }}>-</div>
+                                            <div style={{ marginRight: 5, fontWeight: 'bold', color: '#e85a4f' }}>{order.name}</div>
+                                            <div>x{order.amount}</div>
+                                            <div style={{ marginLeft: 5 }}>({numberWithCommas(Number(order.price) * Number(order.amount))}đ)</div>
+                                        </div>
+                                    ))}
                                     <div style={{ display: 'flex', alignItems: 'center', color: 'green' }}>
                                         <div style={{ marginRight: 5 }}>Tổng tiền:</div>
-                                        <div>50.000đ</div>
+                                        <div>{numberWithCommas(item.total_price)}đ</div>
                                     </div>
                                 </div>
                             </Card>
-                        )}
+                        ) : <Empty description="Không tìm thấy" />}
                     </div>
                 </Modal>
                 <Modal
                     visible={ModalPayment.visible}
                     title="Thanh toán đơn hàng"
                     zIndex={10000}
-                    onOk={() => this.handleOk('ModalPayment')}
+                    onOk={null}
                     onCancel={() => this.hideModal('ModalPayment')}
                     footer={[
                         <Button key="back" onClick={() => this.hideModal('ModalPayment')}>
                             Đóng
                         </Button>,
-                        <Button key="submit" type="primary" loading={ModalPayment.loading} onClick={() => this.handleOk('ModalPayment')}>
+                        <Button key="submit" type="primary" loading={ModalPayment.loading} onClick={this.handlePayment}>
                             Đồng ý
                         </Button>
                     ]}
                 >
                     <div style={{ fontSize: '0.9rem', marginBottom: 5 }}>Người đặt</div>
-                    <Input style={{ marginBottom: 10 }} onChange={e => this.onChange(e, 'orderBy')} />
+                    <Input
+                        style={{ marginBottom: 10, color: 'black' }}
+                        placeholder="Nhập số điện thoại"
+                        onChange={e => this.onChangeFormDataForPayment(e.target.value, 'name')}
+                        value={paymentFormData.name}
+                    />
                     <div style={{ fontSize: '0.9rem', marginBottom: 5 }}>Số điện thoại</div>
-                    <Input style={{ marginBottom: 10 }} onChange={e => this.onChange(e, 'orderPhoneNumber')} />
+                    <Input
+                        style={{ marginBottom: 10, color: 'black' }}
+                        placeholder="Nhập số điện thoại"
+                        onChange={e => this.onChangeFormDataForPayment(e.target.value, 'phone')}
+                        value={paymentFormData.phone}
+                    />
                     <div style={{ fontSize: '0.9rem', marginBottom: 5 }}>Địa chỉ</div>
-                    <TextArea style={{ marginBottom: 10 }} onChange={e => this.onChange(e, 'orderAddress')} />
+                    <TextArea
+                        style={{ color: 'black' }}
+                        placeholder="Nhập địa chỉ"
+                        onChange={e => this.onChangeFormDataForPayment(e.target.value, 'address')}
+                        value={paymentFormData.address}
+                    />
                     <div style={{ fontSize: '0.9rem', marginBottom: 5 }}>Ghi chú</div>
-                    <TextArea style={{ marginBottom: 10 }} onChange={e => this.onChange(e, 'orderDescription')} />
+                    <TextArea
+                        style={{ color: 'black' }}
+                        placeholder="Nhập ghi chú nếu có"
+                        onChange={e => this.onChangeFormDataForPayment(e.target.value, 'note')}
+                        value={paymentFormData.note}
+                    />
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                         <div>Hình thức thanh toán:</div>
                         <div style={{ fontWeight: 'bold', marginLeft: 5 }}>Tiền mặt</div>
+                    </div>
+                </Modal>
+                <Modal
+                    visible={ModalConfirmOrder.visible}
+                    title="Xác nhận các đơn hàng"
+                    zIndex={10000}
+                    onOk={null}
+                    onCancel={() => this.hideModal('ModalConfirmOrder')}
+                    footer={[
+                        <Button key="back" onClick={() => this.hideModal('ModalConfirmOrder')}>
+                            Đóng
+                        </Button>
+                    ]}
+                >
+                    <div style={{ width: '100%', paddingRight: 20, maxHeight: 350, overflowX: 'hidden', overflowY: 'scroll' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
+                            <Select
+                                style={{ width: 150 }}
+                                value={confirmOrderType}
+                                onChange={value => this.setState({ confirmOrderType: value })}
+                                dropdownStyle={{ zIndex: 9999999 }}
+                            >
+                                <Option value={0}>Chưa xem</Option>
+                                <Option value={1}>Đã xác nhận</Option>
+                                <Option value={2}>Hủy bỏ</Option>
+                            </Select>
+                        </div>
+                        {confirmOrderData && confirmOrderData.length > 0 ? confirmOrderData.map((item, index) =>
+                            <Card
+                                key={index.toString()}
+                                size="small"
+                                title={moment(item.order_date).format('DD/MM/YYYY HH:mm')}
+                                style={{
+                                    width: '100%',
+                                    marginTop: index === 0 ? 0 : 10
+                                }}
+                            >
+                                <div>
+                                    Thông tin khách hàng:
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                        <div style={{ marginRight: 5 }}>- Tên khách hàng:</div>
+                                        <div style={{ marginRight: 5, color: '#e85a4f' }}>{item.name}</div>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                        <div style={{ marginRight: 5 }}>- Số điện thoại:</div>
+                                        <div style={{ marginRight: 5, color: '#e85a4f' }}>{item.phone}</div>
+                                    </div>
+                                    <div>- Địa chỉ:</div>
+                                    <div style={{ color: '#e85a4f' }}>{item.address}</div>
+                                    Thông tin đơn hàng:
+                                    {JSON.parse(item.cart).map(order => (
+                                        <div key={order._id} style={{ display: 'flex', alignItems: 'center' }}>
+                                            <div style={{ marginRight: 5 }}>-</div>
+                                            <div style={{ marginRight: 5, fontWeight: 'bold', color: '#e85a4f' }}>{order.name}</div>
+                                            <div>x{order.amount}</div>
+                                            <div style={{ marginLeft: 5 }}>({numberWithCommas(Number(order.price) * Number(order.amount))}đ)</div>
+                                        </div>
+                                    ))}
+                                    <div style={{ display: 'flex', alignItems: 'center', color: 'green' }}>
+                                        <div style={{ marginRight: 5 }}>Tổng tiền:</div>
+                                        <div>{numberWithCommas(item.total_price)}đ</div>
+                                    </div>
+                                    <div style={{ fontWeight: 'bold', color: 'black' }}>Cập nhật trạng thái:</div>
+                                    <Select
+                                        style={{ width: 150, marginTop: 10, marginBottom: 10 }}
+                                        value={item.status}
+                                        onChange={value => this.updateOrderStatus(item, value)}
+                                        dropdownStyle={{ zIndex: 9999999 }}
+                                    >
+                                        <Option value={0}>Chưa xem</Option>
+                                        <Option value={1}>Đã xác nhận</Option>
+                                        <Option value={2}>Hủy bỏ</Option>
+                                    </Select>
+                                    <div>
+                                        <Button onClick={() => this.blockUser(item)} type="danger">Chặn khách hàng</Button>
+                                    </div>
+                                </div>
+                            </Card>
+                        ) : <Empty description="Không tìm thấy" />}
                     </div>
                 </Modal>
             </div>
@@ -835,4 +1119,43 @@ class ComponentPage extends Component {
     }
 };
 
-export default ComponentPage;
+const mapActionToProps = {
+    getAllCakesRequest: CakeActions.getAllCakesRequest,
+    getAllCategoriesRequest: CategoryActions.getAllCategoriesRequest,
+    getAllCartsRequest: CartActions.getAllCartsRequest,
+    createCategoryRequest: CategoryActions.createCategoryRequest,
+    createCategoryChildRequest: CategoryActions.createCategoryChildRequest,
+    updateCategoryRequest: CategoryActions.updateCategoryRequest,
+    updateCategoryChildRequest: CategoryActions.updateCategoryChildRequest,
+    deleteCategoryRequest: CategoryActions.deleteCategoryRequest,
+    deleteCategoryChildRequest: CategoryActions.deleteCategoryChildRequest,
+    updateUserCart: CartActions.updateUserCart,
+    createCakeRequest: CakeActions.createCakeRequest,
+    updateCakeRequest: CakeActions.updateCakeRequest,
+    deleteCakeRequest: CakeActions.deleteCakeRequest,
+    getUserRequest: AccountActions.getUserRequest,
+    createUserRequest: AccountActions.createUserRequest,
+    updateUserRequest: AccountActions.updateUserRequest,
+    logoutRequest: AccountActions.logoutRequest,
+    createOrderRequest: CartActions.createOrderRequest,
+    updateOrderStatusRequest: CartActions.updateOrderStatusRequest,
+    blockUserRequest: AccountActions.blockUserRequest
+};
+
+const mapStateToProps = state => {
+    return {
+        cakeData: state.cake.cake.data,
+        isFetchingCake: state.cake.cake.isFetching,
+        categoryData: state.category.category,
+        isFetchingCategory: state.category.category.isFetching,
+        cartData: state.cart.cart.data,
+        isFetchingCart: state.cart.cart.isFetching,
+        cart: state.cart.userCart,
+        user: state.account.user.data,
+    };
+};
+
+export default connect(
+    mapStateToProps,
+    mapActionToProps
+)(withRouter(ComponentPage));

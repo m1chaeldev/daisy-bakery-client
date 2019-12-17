@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:4000/api/v1';
+const API_URL = 'http://192.168.100.15:4000/api/v1';
 
 async function request(path, method, payload = {}) {
   try {

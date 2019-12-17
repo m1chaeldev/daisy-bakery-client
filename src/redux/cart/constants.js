@@ -1,2 +1,4 @@
 export const GET_ALL_CARTS = 'GET_ALL_CARTS';
 export const UPDATE_USER_CART = 'UPDATE_USER_CART';
+export const CREATE_ORDER = 'CREATE_ORDER';
+export const UPDATE_ORDER_STATUS = 'UPDATE_ORDER_STATUS';

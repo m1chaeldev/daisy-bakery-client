@@ -8,9 +8,10 @@ import { connect } from "react-redux";
 // Component
 import ComponentPage from "./Component";
 // Action
-import CakeActions from "../../../redux/cake/actions"
-import CategoryActions from "../../../redux/category/actions"
-import CartActions from "../../../redux/cart/actions"
+import CakeActions from "../../../redux/cake/actions";
+import CategoryActions from "../../../redux/category/actions";
+import CartActions from "../../../redux/cart/actions";
+import AccountActions from "../../../redux/account/actions";
 
 class ContainerPage extends Component {
 
@@ -54,12 +55,6 @@ const mapActionToProps = {
   getAllCakesRequest: CakeActions.getAllCakesRequest,
   getAllCategoriesRequest: CategoryActions.getAllCategoriesRequest,
   getAllCartsRequest: CartActions.getAllCartsRequest,
-  createCategoryRequest: CategoryActions.createCategoryRequest,
-  createCategoryChildRequest: CategoryActions.createCategoryChildRequest,
-  updateCategoryRequest: CategoryActions.updateCategoryRequest,
-  updateCategoryChildRequest: CategoryActions.updateCategoryChildRequest,
-  deleteCategoryRequest: CategoryActions.deleteCategoryRequest,
-  deleteCategoryChildRequest: CategoryActions.deleteCategoryChildRequest,
   updateUserCart: CartActions.updateUserCart,
   createCakeRequest: CakeActions.createCakeRequest,
   updateCakeRequest: CakeActions.updateCakeRequest,

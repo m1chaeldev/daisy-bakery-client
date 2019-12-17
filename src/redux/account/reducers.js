@@ -7,52 +7,54 @@ const initialState = {
   user: {
     token: undefined,
     data: {
-      name: 'Thái Nguyễn',
-      level: 'Admin'
+      _id: '',
+      id: '',
+      name: '',
+      phone: '',
+      address: '',
+      level: 'Customer'
     },
-    status: false
-  },
-  login: {
-    status: false
+    isFetching: false
   }
 };
 
 const reducer = [
   {
-    on: Actions.loginRequest,
+    on: Actions.getUserRequest,
     handler: state =>
       update(state, {
-        login: {
-          status: {
+        user: {
+          isFetching: {
             $set: true
           }
         }
       })
   },
   {
-    on: Actions.loginFailure,
+    on: Actions.getUserFailure,
     handler: state =>
       update(state, {
-        login: {
-          status: {
+        user: {
+          isFetching: {
             $set: false
           }
         }
       })
   },
   {
-    on: Actions.loginSuccess,
+    on: Actions.getUserSuccess,
     handler: (state, action) => {
-      const { token } = action.payload;
+      const data = action.payload;
       return update(state, {
-        login: {
-          status: {
-            $set: false
-          }
-        },
         user: {
-          token: {
-            $set: token
+          isFetching: {
+            $set: false
+          },
+          data: {
+            $set: {
+              ...data, level:
+                data.id === '1975267912618702' ? 'Admin' : 'Customer'
+            }
           }
         }
       });
@@ -61,7 +63,6 @@ const reducer = [
   {
     on: Actions.logoutRequest,
     handler: () => {
-      localStorage.clear();
       window.location.replace('/');
     }
   }

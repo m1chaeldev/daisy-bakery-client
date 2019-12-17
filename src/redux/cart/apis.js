@@ -9,4 +9,22 @@ async function getAllCarts() {
   }
 }
 
-export default { getAllCarts };
+async function createOrder(data) {
+  try {
+    const res = await restful.POST('/cart', data);
+    return res;
+  } catch (err) {
+    return err;
+  }
+}
+
+async function updateOrderStatus(data) {
+  try {
+    const res = await restful.PUT(`/cart/${data.id}/status`, data);
+    return res;
+  } catch (err) {
+    return err;
+  }
+}
+
+export default { getAllCarts, createOrder, updateOrderStatus };
