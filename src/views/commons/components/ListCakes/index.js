@@ -37,7 +37,7 @@ class ComponentPage extends Component {
 		const limitCakes = limit ? limit : 1000000;
 		return (
 			<Row gutter={[10, 10]}>
-				{data.map((item, index) => index < limitCakes && (
+				{data && data.length > 0 ? data.map((item, index) => index < limitCakes && (
 					<Col
 						key={item._id}
 						xs={24} sm={12} md={12} lg={12} xl={8} xxl={6}
@@ -99,7 +99,7 @@ class ComponentPage extends Component {
 							</div>
 						</div>
 					</Col>
-				))}
+				)) : null}
 			</Row>
 		);
 	}
