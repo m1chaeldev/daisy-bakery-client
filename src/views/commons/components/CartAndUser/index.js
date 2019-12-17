@@ -220,6 +220,7 @@ class ComponentPage extends Component {
             });
         }
         if (state === 'ModalPayment') {
+            if (user.id.length < 1) return alert('Vui lòng đăng nhập để thanh toán');
             if (user.is_block) return alert(`Bạn đã bị chặn vì lý do: ${user.block_reason}. Vui lòng liên hệ nhân viên để biết thêm thông tin`);
             let newData = ModalPayment;
             newData.visible = true;
