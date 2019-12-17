@@ -107,14 +107,14 @@ class ComponentPage extends Component {
         history.push(location);
     };
 
-    handleClickBuyBakery = (item) => {
+    handleClickBuyBakery = (item, price) => {
         if (item.is_out_stock) return message.error(`Bánh này hiện tại đã hết, vui lòng liên hệ ${shopPhone}`);
         const { cart, updateUserCart } = this.props;
         const newCart = cart;
         const isExist = newCart.findIndex(obj => obj.name === item.name);
         if (isExist === -1) {
             let bakery = [...newCart];
-            const newItem = { ...item, amount: 1 };
+            const newItem = { ...item, amount: 1, price };
             bakery.push(newItem);
             updateUserCart(bakery);
             message.success(`Đã thêm "${item.name}" vào giỏ hàng`);

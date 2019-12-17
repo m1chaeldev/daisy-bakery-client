@@ -41,7 +41,7 @@ class ComponentPage extends Component {
 					<Col
 						key={item._id}
 						xs={24} sm={12} md={12} lg={12} xl={8} xxl={6}
-						onClick={() => handleClickBuyBakery(item)}
+						onClick={() => handleClickBuyBakery(item, Number(item.price) - this.calcPercent(item.sale_off, item.price))}
 						style={styles.eachBakery}
 						className="EachBakery"
 					>

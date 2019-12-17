@@ -610,6 +610,7 @@ class ComponentPage extends Component {
     blockUser = item => {
         const { blockUserRequest } = this.props;
         const { blockReason } = this.state;
+        if (blockReason.length < 3) return alert('Lý do phải có ít nhất 3 kí tự');
         if (window.confirm(`Chặn khách hàng ${item.name}?`)) {
             blockUserRequest({
                 id: item.owner,
@@ -618,6 +619,12 @@ class ComponentPage extends Component {
                 serverKey: 'tuoilzphaduoctao123'
             });
         }
+    };
+
+    getConfirmOrderBadge = () => {
+        const { cartData } = this.props;
+        const data = cartData && cartData.length > 0 ? cartData.filter(obj => obj.status === 0) : [];
+        return data.length;
     };
 
     render() {
@@ -642,6 +649,7 @@ class ComponentPage extends Component {
         } = this.props;
         const historyData = this.getHistoryOrderOfUser();
         const confirmOrderData = this.getConfirmOrderData(confirmOrderType);
+        const confirmOrderBadge = this.getConfirmOrderBadge();
         return (
             <div style={styles.content}>
                 <Col xs={22} sm={22} md={18} lg={16} xl={16}
@@ -745,12 +753,24 @@ class ComponentPage extends Component {
                         </div>
                     )}
                     {user.level === 'Admin' && (
-                        <img
-                            alt=""
-                            src={listIcon}
-                            style={{ ...styles.cartIcon, marginRight: 10 }}
-                            onClick={() => this.showModal('ModalConfirmOrder')}
-                        />
+                        <div
+                            style={{ marginRight: 10, position: 'relative', cursor: 'pointer' }}
+                            onClick={null}
+                        >
+                            <img
+                                alt=""
+                                src={listIcon}
+                                style={{ ...styles.cartIcon, marginRight: 0 }}
+                                onClick={() => this.showModal('ModalConfirmOrder')}
+                            />
+                            {confirmOrderBadge && confirmOrderBadge > 0 && (
+                                <div style={{ ...styles.badgeWrapper, right: -3 }}>
+                                    <div style={{ fontSize: '0.7rem', color: 'white' }}>
+                                        {confirmOrderBadge > 9 ? '9+' : confirmOrderBadge}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     )}
                     {user.level === 'Admin' && (
                         <img
@@ -962,7 +982,7 @@ class ComponentPage extends Component {
                     ]}
                 >
                     <div style={{ width: '100%', paddingRight: 20, maxHeight: 350, overflowX: 'hidden', overflowY: 'scroll' }}>
-                        {historyData && historyData.length > 0 ? historyData.map((item, index) =>
+                        {historyData && historyData.length > 0 ? historyData.sort().reverse().map((item, index) =>
                             <Card
                                 key={index.toString()}
                                 size="small"
@@ -977,8 +997,8 @@ class ComponentPage extends Component {
                                         <div key={order._id} style={{ display: 'flex', alignItems: 'center' }}>
                                             <div style={{ marginRight: 5 }}>-</div>
                                             <div style={{ marginRight: 5, fontWeight: 'bold', color: '#e85a4f' }}>{order.name}</div>
-                                            <div>x{order.amount}</div>
-                                            <div style={{ marginLeft: 5 }}>({numberWithCommas(Number(order.price) * Number(order.amount))}đ)</div>
+                                            <div style={{ color: '#333' }}>x{order.amount}</div>
+                                            <div style={{ marginLeft: 5, color: '#333' }}>({numberWithCommas(Number(order.price) * Number(order.amount))}đ)</div>
                                         </div>
                                     ))}
                                     <div style={{ display: 'flex', alignItems: 'center', color: 'green' }}>
@@ -1074,24 +1094,23 @@ class ComponentPage extends Component {
                                 }}
                             >
                                 <div>
-                                    Thông tin khách hàng:
-                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        <div style={{ marginRight: 5 }}>- Tên khách hàng:</div>
-                                        <div style={{ marginRight: 5, color: '#e85a4f' }}>{item.name}</div>
+                                    <div style={{ fontWeight: 'bold', color: 'black' }}>Thông tin khách hàng:</div>
+                                    <div style={{ color: '#000' }}>- Tên khách hàng:
+                                        <span style={{ marginLeft: 5, color: '#333' }}>{item.name}</span>
                                     </div>
-                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        <div style={{ marginRight: 5 }}>- Số điện thoại:</div>
-                                        <div style={{ marginRight: 5, color: '#e85a4f' }}>{item.phone}</div>
+                                    <div style={{ color: '#000' }}>- Số điện thoại:
+                                        <span style={{ marginLeft: 5, color: '#333' }}>{item.phone}</span>
                                     </div>
-                                    <div>- Địa chỉ:</div>
-                                    <div style={{ color: '#e85a4f' }}>{item.address}</div>
-                                    Thông tin đơn hàng:
+                                    <div style={{ color: '#000' }}>- Địa chỉ:
+                                        <span style={{ marginLeft: 5, color: '#333' }}>{item.address}</span>
+                                    </div>
+                                    <div style={{ fontWeight: 'bold', color: 'black' }}>Thông tin đơn hàng:</div>
                                     {JSON.parse(item.cart).map(order => (
                                         <div key={order._id} style={{ display: 'flex', alignItems: 'center' }}>
                                             <div style={{ marginRight: 5 }}>-</div>
                                             <div style={{ marginRight: 5, fontWeight: 'bold', color: '#e85a4f' }}>{order.name}</div>
-                                            <div>x{order.amount}</div>
-                                            <div style={{ marginLeft: 5 }}>({numberWithCommas(Number(order.price) * Number(order.amount))}đ)</div>
+                                            <div style={{ color: '#333' }}>x{order.amount}</div>
+                                            <div style={{ marginLeft: 5, color: '#333' }}>({numberWithCommas(Number(order.price) * Number(order.amount))}đ)</div>
                                         </div>
                                     ))}
                                     <div style={{ display: 'flex', alignItems: 'center', color: 'green' }}>
