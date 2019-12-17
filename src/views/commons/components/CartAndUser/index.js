@@ -630,7 +630,8 @@ class ComponentPage extends Component {
             userFormData,
             paymentFormData,
             ModalConfirmOrder,
-            confirmOrderType
+            confirmOrderType,
+            blockReason
         } = this.state;
         const {
             categoryData,
@@ -1107,6 +1108,12 @@ class ComponentPage extends Component {
                                         <Option value={2}>Hủy bỏ</Option>
                                     </Select>
                                     <div>
+                                        <Input
+                                            style={{ marginBottom: 10, color: 'black' }}
+                                            placeholder="Nhập lý do chặn"
+                                            onChange={e => this.setState({ blockReason: e.target.value })}
+                                            value={blockReason}
+                                        />
                                         <Button onClick={() => this.blockUser(item)} type="danger">Chặn khách hàng</Button>
                                     </div>
                                 </div>
