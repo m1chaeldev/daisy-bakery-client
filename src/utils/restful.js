@@ -1,4 +1,5 @@
-const API_URL = 'http://192.168.100.15:4000/api/v1';
+const API_URL = 'https://banhdaisy.com:4000/api/v1'; // for product
+// const API_URL = 'https://localhost:4000/api/v1'; // for dev
 
 async function request(path, method, payload = {}) {
   try {
