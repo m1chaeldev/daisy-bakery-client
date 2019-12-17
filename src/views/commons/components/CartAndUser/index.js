@@ -327,6 +327,7 @@ class ComponentPage extends Component {
                         appId="547549069433611"
                         fields="name,email,picture"
                         callback={this.responseFacebook}
+                        isMobile={false}
                         render={renderProps => (
                             <button
                                 onClick={renderProps.onClick}

@@ -45,11 +45,11 @@ function getBase64(img, callback) {
 function beforeUpload(file) {
     const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
     if (!isJpgOrPng) {
-        message.error('You can only upload JPG/PNG file!');
+        alert('Vui lòng chọn định dạng JPG hoặc PNG!');
     }
-    const isLt2M = file.size / 1024 / 1024 < 2;
+    const isLt2M = file.size / 1024 / 1024 < 5;
     if (!isLt2M) {
-        message.error('Image must smaller than 2MB!');
+        alert('Vui lòng chọn kích cỡ file nhỏ hơn 5MB!');
     }
     return isJpgOrPng && isLt2M;
 }
