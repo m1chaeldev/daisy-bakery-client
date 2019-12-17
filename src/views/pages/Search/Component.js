@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Col, message, Dropdown, Button, Icon, Menu, Modal, Input, Upload, Select } from 'antd';
+import { Col, message, Button, Icon, Modal, Input, Upload, Select } from 'antd';
 import Header from './../../commons/components/Header';
 import Slider from './../../commons/components/Slider';
 import Footer from './../../commons/components/Footer';
@@ -11,7 +11,6 @@ import CartAndUser from './../../commons/components/CartAndUser';
 import styles from './styles';
 import './styles.css';
 
-const { moment } = require('moment');
 const { Option } = Select;
 const shopPhone = '0349445935';
 
@@ -26,12 +25,6 @@ const shopPhone = '0349445935';
 // function numberWithCommas(x) {
 //     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 // }
-
-function getBase64(img, callback) {
-    const reader = new FileReader();
-    reader.addEventListener('load', () => callback(reader.result));
-    reader.readAsDataURL(img);
-}
 
 function beforeUpload(file) {
     const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
@@ -49,10 +42,28 @@ class ComponentPage extends Component {
     constructor(props) {
         super(props)
         this.state = {
+            ModalAddCake: {
+                loading: false,
+                visible: false
+            },
+            formData: {
+                id: '',
+                name: '',
+                image: null,
+                is_out_stock: 'false',
+                category: null,
+                category_child: null,
+                code: '',
+                price: '',
+                sale_off: '',
+                serverKey: 'tuoilzphaduoctao123'
+            },
+            loading: null,
             cakeCategoryEdit: '',
-            cakeData: null,
+            mode: 'create',
             width: 0,
-            height: 0
+            height: 0,
+            cakeData: null
         }
     }
 
@@ -99,11 +110,6 @@ class ComponentPage extends Component {
         }
     };
 
-    handleClickEdit = (e, item) => {
-        e.stopPropagation();
-        message.success(item.name);
-    };
-
     isNewCake = (startedDate) => {
         const date = new Date();
         let validDate = new Date(startedDate);
@@ -112,9 +118,129 @@ class ComponentPage extends Component {
         return false;
     };
 
+    resetFormData = () => {
+        const data = {
+            id: '',
+            name: '',
+            image: null,
+            is_out_stock: 'false',
+            category: null,
+            category_child: null,
+            code: '',
+            price: '',
+            sale_off: '',
+            serverKey: 'tuoilzphaduoctao123'
+        };
+        this.setState({ formData: data });
+    };
+
+    handleEditCake = async (e, item) => {
+        e.stopPropagation();
+        await this.resetFormData();
+        const { formData } = this.state;
+        const { categoryData } = this.props;
+        const categories = categoryData && categoryData.data ? categoryData.data.filter(obj => obj._id === item.category) : [];
+        const newData = formData;
+        newData.id = item._id;
+        newData.name = item.name;
+        newData.image = item.image;
+        newData.is_out_stock = item.is_out_stock === false ? 'false' : 'true';
+        newData.category = item.category;
+        newData.category_child = item.category_child;
+        newData.code = item.code;
+        newData.price = item.price;
+        newData.sale_off = item.sale_off;
+        this.setState({ cakeCategoryEdit: categories[0], formData: newData, mode: 'edit' });
+        this.showModal('ModalAddCake');
+    };
+
+    handleDeleteCake = async (e, item) => {
+        e.stopPropagation();
+        const { deleteCakeRequest } = this.props;
+        if (window.confirm("Dữ liệu sẽ biến mất vĩnh viễn nếu bạn xóa")) {
+            deleteCakeRequest({
+                id: item._id,
+                serverKey: 'tuoilzphaduoctao123'
+            });
+        }
+    };
+
+    handleCreateCake = async (category) => {
+        const { categoryData } = this.props;
+        await this.resetFormData();
+        const { formData } = this.state;
+        const newData = formData;
+        newData.category = category._id;
+        const child = categoryData && categoryData.child ? categoryData.child.filter(obj => obj.category === category._id) : [];
+        newData.category_child = child.length > 0 ? child[0]._id : null;
+        this.setState({ cakeCategoryEdit: category, formData: newData, mode: 'create' });
+        this.showModal('ModalAddCake');
+    };
+
+    getChildCategories = (category) => {
+        const { categoryData } = this.props;
+        const child = categoryData && categoryData.child ? categoryData.child.filter(obj => obj.category === category._id) : [];
+        return child;
+    };
+
+    getCategories = (category) => {
+        const { categoryData } = this.props;
+        const categories = categoryData && categoryData.data ? categoryData.data.filter(obj => obj._id === category._id) : [];
+        return categories;
+    };
+
+    showModal = (state) => {
+        const { ModalAddCake } = this.state;
+        if (state === 'ModalAddCake') {
+            let newData = ModalAddCake;
+            newData.visible = true;
+            this.setState({
+                ModalAddCake: newData,
+            });
+        }
+    };
+
+    hideModal = (state) => {
+        const { ModalAddCake } = this.state;
+        if (state === 'ModalAddCake') {
+            let newData = ModalAddCake;
+            newData.visible = false;
+            this.setState({
+                ModalAddCake: newData,
+            });
+        }
+    };
+
+    onChangeFormData = (value, key) => {
+        const { formData } = this.state;
+        let newData = formData;
+        newData[key] = value;
+        this.setState({ formData: newData });
+    };
+
+    onSubmitCreateCake = () => {
+        const { formData, mode } = this.state;
+        if (formData.name.length > 0 && formData.code.length > 0 && Number(formData.price) > 0
+            && Number(formData.sale_off) > 0 && formData.image) {
+            const {
+                createCakeRequest,
+                updateCakeRequest
+            } = this.props;
+            if (mode === 'create') createCakeRequest(formData);
+            else updateCakeRequest(formData);
+            this.hideModal('ModalAddCake');
+        } else message.error('Vui lòng nhập đầy đủ các thông tin');
+    };
+
     render() {
-        const { width } = this.state;
+        const { width, formData, cakeCategoryEdit, ModalAddCake, loading } = this.state;
         const { user, cakeData } = this.props;
+        const uploadButton = (
+            <div>
+                <Icon type={this.state.loading ? 'loading' : 'plus'} />
+                <div className="ant-upload-text">Upload</div>
+            </div>
+        );
         const { key } = this.props.match.params;
         const cakeList = cakeData ? cakeData.filter(obj => obj.name.toLowerCase().includes(key.toLowerCase())) : [];
         return (
@@ -135,7 +261,8 @@ class ComponentPage extends Component {
                                     data={cakeList.length > 0 ? cakeList : []}
                                     user={user}
                                     handleClickBuyBakery={this.handleClickBuyBakery}
-                                    handleClickEdit={this.handleClickEdit}
+                                    handleClickEdit={this.handleEditCake}
+                                    handleClickDelete={this.handleDeleteCake}
                                     isNewCake={this.isNewCake}
                                 />
                             </div>
@@ -143,6 +270,99 @@ class ComponentPage extends Component {
                     </Col>
                 </div>
                 <Footer width={width} developerGoto={this.developerGoto} />
+                <Modal
+                    visible={ModalAddCake.visible}
+                    title={`Thêm bánh - ${cakeCategoryEdit.name}`}
+                    onOk={this.onSubmitCreateCake}
+                    onCancel={() => this.hideModal('ModalAddCake')}
+                    footer={[
+                        <Button key="back" onClick={() => this.hideModal('ModalAddCake')}>
+                            Đóng
+                        </Button>,
+                        <Button
+                            key="submit"
+                            type="primary"
+                            loading={ModalAddCake.loading || loading ? true : false}
+                            onClick={this.onSubmitCreateCake}
+                        >
+                            Đồng ý
+                        </Button>
+                    ]}
+                >
+                    <div style={{ fontSize: '0.9rem', marginBottom: 5 }}>Tên bánh</div>
+                    <Input
+                        placeholder="Nhập tên bánh"
+                        style={{ marginBottom: 10, color: 'black' }}
+                        value={formData.name}
+                        onChange={e => this.onChangeFormData(e.target.value, 'name')}
+                    />
+                    <div style={{ fontSize: '0.9rem', marginBottom: 5 }}>Mã bánh</div>
+                    <Input
+                        placeholder="Nhập mã bánh"
+                        style={{ marginBottom: 10, color: 'black' }}
+                        value={formData.code}
+                        onChange={e => this.onChangeFormData(e.target.value, 'code')}
+                    />
+                    <div style={{ fontSize: '0.9rem', marginBottom: 5 }}>Danh mục</div>
+                    <Select
+                        value={formData.category}
+                        disabled
+                        style={{ width: '100%', marginBottom: 5 }}
+                    >
+                        {this.getCategories(cakeCategoryEdit).map(category => (
+                            <Option key={category._id} value={category._id}>{category.name}</Option>
+                        ))}
+                    </Select>
+                    <div style={{ fontSize: '0.9rem', marginBottom: 5 }}>Danh mục con</div>
+                    <Select
+                        value={formData.category_child}
+                        style={{ width: '100%', marginBottom: 5 }}
+                        onChange={value => this.onChangeFormData(value, 'category_child')}
+                    >
+                        {this.getChildCategories(cakeCategoryEdit).map(child => (
+                            <Option key={child._id} value={child._id}>{child.name}</Option>
+                        ))}
+                    </Select>
+                    <div style={{ fontSize: '0.9rem', marginBottom: 5 }}>Giá (đ)</div>
+                    <Input
+                        placeholder="Nhập giá bánh"
+                        style={{ marginBottom: 10, color: 'black' }}
+                        value={formData.price}
+                        onChange={e => this.onChangeFormData(e.target.value, 'price')}
+                    />
+                    <div style={{ width: '100%', display: 'flex', alignItems: 'center' }}>
+                        <div style={{ flex: 1, marginRight: 20 }}>
+                            <Select
+                                style={{ width: 120 }}
+                                value={formData.is_out_stock}
+                                onChange={value => this.onChangeFormData(value, 'is_out_stock')}
+                            >
+                                <Option value="false">Còn hàng</Option>
+                                <Option value="true">Hết hàng</Option>
+                            </Select>
+                            <div style={{ fontSize: '0.9rem', marginBottom: 5, marginTop: 5 }}>Giảm giá (%)</div>
+                            <Input
+                                placeholder="Nhập số lượng phần trăm (vd: 25)"
+                                style={{ color: 'black' }}
+                                value={formData.sale_off}
+                                onChange={e => this.onChangeFormData(e.target.value, 'sale_off')}
+                            />
+                        </div>
+                        <div>
+                            <Upload
+                                name="avatar"
+                                listType="picture-card"
+                                className="avatar-uploader"
+                                showUploadList={false}
+                                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                                beforeUpload={beforeUpload}
+                                onChange={this.handleUploadChange}
+                            >
+                                {formData.image ? <img src={formData.image} alt="" style={{ width: '100%' }} /> : uploadButton}
+                            </Upload>
+                        </div>
+                    </div>
+                </Modal>
             </div>
         );
     }

@@ -214,10 +214,10 @@ const styles = {
         fontFamily: 'Open Sans, sans-serif'
     },
     bakeryPriceSaleOff: {
-        fontSize: '1rem',
-        fontFamily: 'Open Sans, sans-serif',
         fontStyle: 'italic',
-        textDecoration: 'line-through'
+        textDecoration: 'line-through',
+        fontSize: '0.9rem',
+        fontFamily: 'Open Sans, sans-serif'
     },
     bakeryImageWrapper: {
         width: '100%',
