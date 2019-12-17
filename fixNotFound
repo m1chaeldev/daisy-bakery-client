@@ -5,3 +5,20 @@ RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -d
 RewriteRule ^ - [L]
 
 RewriteRule ^ /index.html [L]
+
+// or
+
+RewriteEngine On
+RewriteBase /
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-l
+RewriteRule ^.*$ / [L,QSA]
+
+// Vào /etc/apache2/sites-available/000-default.conf
+// Thêm
+	<Directory "/var/www/html">
+  		AllowOverride All
+	</Directory>
+// Dưới
+    DocumentRoot /var/www/html
