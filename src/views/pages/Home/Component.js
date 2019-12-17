@@ -265,7 +265,7 @@ class ComponentPage extends Component {
 
     getCakeData = (category) => {
         const { cakeData } = this.props;
-        let data = cakeData.filter(obj => obj.category === category._id);
+        let data = cakeData && cakeData.filter(obj => obj.category === category._id);
         return data;
     };
 
