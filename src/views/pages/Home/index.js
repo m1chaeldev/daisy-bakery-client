@@ -60,7 +60,10 @@ const mapActionToProps = {
   updateCategoryChildRequest: CategoryActions.updateCategoryChildRequest,
   deleteCategoryRequest: CategoryActions.deleteCategoryRequest,
   deleteCategoryChildRequest: CategoryActions.deleteCategoryChildRequest,
-  updateUserCart: CartActions.updateUserCart
+  updateUserCart: CartActions.updateUserCart,
+  createCakeRequest: CakeActions.createCakeRequest,
+  updateCakeRequest: CakeActions.updateCakeRequest,
+  deleteCakeRequest: CakeActions.deleteCakeRequest
 };
 
 const mapStateToProps = state => {

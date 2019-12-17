@@ -6,6 +6,7 @@ import styles from './styles';
 import './style.css';
 
 const editIcon = require('./../../images/icons/edit.png');
+const deleteIcon = require('./../../images/icons/delete.png');
 
 function numberWithCommas(x) {
 	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -25,7 +26,14 @@ class ComponentPage extends Component {
 	};
 
 	render() {
-		const { data, limit, handleClickBuyBakery, user, handleClickEdit, isNewCake } = this.props;
+		const {
+			data,
+			limit,
+			handleClickBuyBakery,
+			user,
+			handleClickEdit,
+			handleClickDelete,
+			isNewCake } = this.props;
 		const limitCakes = limit ? limit : 1000000;
 		return (
 			<Row gutter={[10, 10]}>
@@ -60,13 +68,21 @@ class ComponentPage extends Component {
 									</div>
 								</div>
 							)}
-							{user.role === 'Admin' && (
-								<img
-									src={editIcon}
-									alt=""
-									style={styles.editIcon}
-									onClick={e => handleClickEdit(e, item)}
-								/>
+							{user.level === 'Admin' && (
+								<div>
+									<img
+										src={editIcon}
+										alt=""
+										style={{ ...styles.editIcon, right: 30 }}
+										onClick={e => handleClickEdit(e, item)}
+									/>
+									<img
+										src={deleteIcon}
+										alt=""
+										style={styles.editIcon}
+										onClick={e => handleClickDelete(e, item)}
+									/>
+								</div>
 							)}
 						</div>
 						<div style={{ textAlign: 'center', marginTop: 10 }}>

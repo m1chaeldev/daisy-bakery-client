@@ -18,14 +18,76 @@ function* handleGetAllCakes(action) {
   }
 }
 
+function* handleCreateCake(action) {
+  try {
+    const data = action.payload;
+    const res = yield call(APIs.createCake, data);
+    if (res && res.message === 'OK') {
+      yield put(Actions.createCakeSuccess());
+      yield put(Actions.getAllCakesRequest());
+      message.success('Thành công');
+    } else {
+      yield put(Actions.createCakeFailure());
+      message.error('Thất bại');
+      console.log(res.message === 'serverKey invalid' ? 'Key đâu?' : '');
+    }
+  } catch (err) {
+    yield put(Actions.createCakeFailure());
+    message.error('Thất bại');
+    yield console.log(err);
+  }
+}
 
-function* watchGetAllCakesRequest() {
+function* handleUpdateCake(action) {
+  try {
+    const data = action.payload;
+    const res = yield call(APIs.updateCake, data);
+    if (res && res.message === 'OK') {
+      yield put(Actions.updateCakeSuccess());
+      yield put(Actions.getAllCakesRequest());
+      message.success('Thành công');
+    } else {
+      yield put(Actions.updateCakeFailure());
+      message.error('Thất bại');
+      console.log(res.message === 'serverKey invalid' ? 'Key đâu?' : '');
+    }
+  } catch (err) {
+    yield put(Actions.updateCakeFailure());
+    message.error('Thất bại');
+    yield console.log(err);
+  }
+}
+
+function* handleDeleteCake(action) {
+  try {
+    const data = action.payload;
+    const res = yield call(APIs.deleteCake, data);
+    if (res && res.message === 'OK') {
+      yield put(Actions.deleteCakeSuccess());
+      yield put(Actions.getAllCakesRequest());
+      message.success('Thành công');
+    } else {
+      yield put(Actions.deleteCakeFailure());
+      message.error('Thất bại');
+      console.log(res.message === 'serverKey invalid' ? 'Key đâu?' : '');
+    }
+  } catch (err) {
+    yield put(Actions.deleteCakeFailure());
+    message.error('Thất bại');
+    yield console.log(err);
+  }
+}
+
+function* watchCategoryCRUD() {
   yield takeLatest(Actions.getAllCakesRequest, handleGetAllCakes);
+  yield takeLatest(Actions.createCakeRequest, handleCreateCake);
+  yield takeLatest(Actions.updateCakeRequest, handleUpdateCake);
+  yield takeLatest(Actions.deleteCakeRequest, handleDeleteCake);
 }
 
 export default function* rootSaga() {
   yield all([
-    fork(watchGetAllCakesRequest),
+    fork(watchCategoryCRUD),
     // fork(watchLoginRequest)
   ]);
 }
