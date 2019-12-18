@@ -763,7 +763,7 @@ class ComponentPage extends Component {
                                 style={{ ...styles.cartIcon, marginRight: 0 }}
                                 onClick={() => this.showModal('ModalConfirmOrder')}
                             />
-                            {confirmOrderBadge && confirmOrderBadge > 0 && (
+                            {confirmOrderBadge > 0 && (
                                 <div style={{ ...styles.badgeWrapper, right: -3 }}>
                                     <div style={{ fontSize: '0.7rem', color: 'white' }}>
                                         {confirmOrderBadge > 9 ? '9+' : confirmOrderBadge}
@@ -943,7 +943,7 @@ class ComponentPage extends Component {
                             Đóng
                         </Button>,
                         <Button key="submit" type="primary" loading={ModalUserInformation.loading} onClick={this.handleEditUserInformation}>
-                            Đồng ý
+                            Cập nhật
                         </Button>
                     ]}
                 >
