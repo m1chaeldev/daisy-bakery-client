@@ -90,7 +90,7 @@ class ComponentPage extends Component {
 							<div style={styles.bakeryCode}># {item.code}</div>
 							<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
 								<div style={item.sale_off && Number(item.sale_off) > 0 ? styles.bakeryPriceSaleOff : styles.bakeryPrice}>{numberWithCommas(item.price)}đ</div>
-								{item.sale_off && Number(item.sale_off) > 0 && (
+								{Number(item.sale_off) > 0 && (
 									<div style={{ display: 'flex', alignItems: 'center' }}>
 										<div style={{ ...styles.bakeryPrice, marginLeft: 10, marginRight: 5 }}>{numberWithCommas(Number(item.price) - this.calcPercent(item.sale_off, item.price))}đ</div>
 										<div style={{ ...styles.bakeryPrice, color: 'red', fontWeight: 'normal', fontStyle: 'italic' }}>-{item.sale_off}%</div>
