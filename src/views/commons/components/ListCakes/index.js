@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col } from 'antd';
+import { Row, Col, Empty } from 'antd';
 
 // Styles
 import styles from './styles';
@@ -99,7 +99,7 @@ class ComponentPage extends Component {
 							</div>
 						</div>
 					</Col>
-				)) : null}
+				)) : <Empty description="Danh mục này hiện chưa có sản phẩm" />}
 			</Row>
 		);
 	}
