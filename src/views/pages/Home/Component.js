@@ -147,12 +147,15 @@ class ComponentPage extends Component {
     onSubmitCreateCake = () => {
         const { formData, mode } = this.state;
         if (formData.name.length > 0 && formData.code.length > 0 && Number(formData.price) > 0
-            && Number(formData.sale_off) > 0 && formData.image) {
+            && formData.image) {
             const {
                 createCakeRequest,
                 updateCakeRequest
             } = this.props;
-            if (mode === 'create') createCakeRequest(formData);
+            if (mode === 'create') createCakeRequest({
+                ...formData,
+                sale_off: formData.sale_off && Number(formData.sale_off) >= 0 ? Number(formData.sale_off) : 0
+            });
             else updateCakeRequest(formData);
             this.hideModal('ModalAddCake');
         } else message.error('Vui lòng nhập đầy đủ các thông tin');
