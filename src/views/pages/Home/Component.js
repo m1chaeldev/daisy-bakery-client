@@ -186,15 +186,24 @@ class ComponentPage extends Component {
     };
 
     onChangeFormData = (value, key) => {
+        const { categoryData } = this.props;
         const { formData } = this.state;
         let newData = formData;
         newData[key] = value;
+        if (key === 'category') {
+            const child = categoryData && categoryData.child ? categoryData.child.filter(obj => obj.category === newData.category) : [];
+            newData.category_child = child.length > 0 ? child[0]._id : null;
+        };
         this.setState({ formData: newData });
     };
 
     getChildCategories = (category) => {
         const { categoryData } = this.props;
-        const child = categoryData && categoryData.child ? categoryData.child.filter(obj => obj.category === category._id) : [];
+        const { mode } = this.state;
+        let child = [];
+        if (mode === 'create')
+            child = categoryData && categoryData.child ? categoryData.child.filter(obj => obj.category === category._id) : [];
+        else child = categoryData && categoryData.child ? categoryData.child.filter(obj => obj.category === category) : [];
         return child;
     };
 
@@ -368,6 +377,7 @@ class ComponentPage extends Component {
                         value={formData.category}
                         disabled={mode === 'create' ? true : false}
                         style={{ width: '100%', marginBottom: 5 }}
+                        onChange={value => this.onChangeFormData(value, 'category')}
                     >
                         {mode === 'create' ? this.getCategories(cakeCategoryEdit).map(category => (
                             <Option key={category._id} value={category._id}>{category.name}</Option>
@@ -379,6 +389,7 @@ class ComponentPage extends Component {
                     <Select
                         value={formData.category_child}
                         style={{ width: '100%', marginBottom: 5 }}
+                        placeholder="Danh mục con trống"
                         onChange={value => this.onChangeFormData(value, 'category_child')}
                     >
                         {mode === 'create' ? this.getChildCategories(cakeCategoryEdit).map(child => (
