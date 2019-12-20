@@ -192,7 +192,7 @@ class ComponentPage extends Component {
         newData[key] = value;
         if (key === 'category') {
             const child = categoryData && categoryData.child ? categoryData.child.filter(obj => obj.category === newData.category) : [];
-            newData.category_child = child.length > 0 ? child[0]._id : null;
+            newData.category_child = child.length > 0 ? child[0]._id : undefined;
         };
         this.setState({ formData: newData });
     };
