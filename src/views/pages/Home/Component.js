@@ -270,7 +270,7 @@ class ComponentPage extends Component {
     };
 
     render() {
-        const { width, ModalAddCake, cakeCategoryEdit, loading, formData } = this.state;
+        const { width, ModalAddCake, cakeCategoryEdit, loading, formData, mode } = this.state;
         const { categoryData, user } = this.props;
         const uploadButton = (
             <div>
@@ -365,7 +365,7 @@ class ComponentPage extends Component {
                     <div style={{ fontSize: '0.9rem', marginBottom: 5 }}>Danh mục</div>
                     <Select
                         value={formData.category}
-                        disabled
+                        disabled={mode === 'create' ? true : false}
                         style={{ width: '100%', marginBottom: 5 }}
                     >
                         {this.getCategories(cakeCategoryEdit).map(category => (

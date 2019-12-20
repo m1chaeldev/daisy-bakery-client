@@ -309,7 +309,7 @@ class ComponentPage extends Component {
     };
 
     responseFacebook = (res) => {
-        if (res.userID.length > 1 && res.name.length > 1) {
+        if ( res && res.userID && res.userID.length > 1 && res.name && res.name.length > 1) {
             const { getUserRequest } = this.props;
             getUserRequest({
                 id: res.userID,
