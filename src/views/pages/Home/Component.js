@@ -381,7 +381,9 @@ class ComponentPage extends Component {
                         style={{ width: '100%', marginBottom: 5 }}
                         onChange={value => this.onChangeFormData(value, 'category_child')}
                     >
-                        {this.getChildCategories(cakeCategoryEdit).map(child => (
+                        {mode === 'create' ? this.getChildCategories(cakeCategoryEdit).map(child => (
+                            <Option key={child._id} value={child._id}>{child.name}</Option>
+                        )) : this.getChildCategories(formData.category).map(child => (
                             <Option key={child._id} value={child._id}>{child.name}</Option>
                         ))}
                     </Select>
