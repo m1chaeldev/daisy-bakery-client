@@ -278,6 +278,7 @@ class ComponentPage extends Component {
                 <div className="ant-upload-text">Upload</div>
             </div>
         );
+        const allCategories = categoryData && categoryData.data && categoryData.data.length > 0 ? categoryData.data : [];
         return (
             <div style={styles.container}>
                 <Header handleClickLogo={() => this.handleClickHMenuIcon('/home')} />
@@ -368,7 +369,9 @@ class ComponentPage extends Component {
                         disabled={mode === 'create' ? true : false}
                         style={{ width: '100%', marginBottom: 5 }}
                     >
-                        {this.getCategories(cakeCategoryEdit).map(category => (
+                        {mode === 'create' ? this.getCategories(cakeCategoryEdit).map(category => (
+                            <Option key={category._id} value={category._id}>{category.name}</Option>
+                        )) : allCategories.map(category => (
                             <Option key={category._id} value={category._id}>{category.name}</Option>
                         ))}
                     </Select>
