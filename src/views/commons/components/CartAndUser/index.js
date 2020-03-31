@@ -9,6 +9,15 @@ import CartActions from "../../../../redux/cart/actions";
 import AccountActions from "../../../../redux/account/actions";
 // import LoadingIcon from './../../commons/components/LoadingIcon';
 
+import {
+    shopYoutubeUrl,
+    shopInstagramUrl,
+    shopFacebookUrl,
+    shopGmail,
+    shopAddress,
+    shopPhone
+} from './../../../../utils/shopInfo';
+
 // Styles
 import styles from './styles';
 import './styles.css';
@@ -17,13 +26,6 @@ const moment = require('moment');
 const { Option } = Select;
 const { Search } = Input;
 const { TextArea } = Input;
-
-const shopYoutubeUrl = 'https://www.facebook.com/';
-const shopTwitterUrl = 'https://www.facebook.com/';
-const shopInstagramUrl = 'https://www.instagram.com/';
-const shopGmail = 'example@gmail.com';
-const shopAddress = '24/212 Tran Quang Khai, TP. Nha Trang';
-const shopPhone = '0349445935';
 
 const facebookIcon = require('./../../images/icons/facebook.png');
 const rightArrowIcon = require('./../../images/icons/right-arrow.png');
@@ -38,7 +40,7 @@ const listIcon = require('./../../images/icons/list.png');
 const hMenu = [
     {
         image: require('./../../images/icons/facebook.png'),
-        to: 'https://www.facebook.com/'
+        to: shopFacebookUrl
     },
     {
         image: require('./../../images/icons/youtube.png'),
@@ -47,10 +49,6 @@ const hMenu = [
     {
         image: require('./../../images/icons/instagram.png'),
         to: shopInstagramUrl
-    },
-    {
-        image: require('./../../images/icons/twitter.png'),
-        to: shopTwitterUrl
     }
 ];
 
@@ -309,7 +307,7 @@ class ComponentPage extends Component {
     };
 
     responseFacebook = (res) => {
-        if ( res && res.userID && res.userID.length > 1 && res.name && res.name.length > 1) {
+        if (res && res.userID && res.userID.length > 1 && res.name && res.name.length > 1) {
             const { getUserRequest } = this.props;
             getUserRequest({
                 id: res.userID,

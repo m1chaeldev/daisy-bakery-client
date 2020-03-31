@@ -11,7 +11,7 @@ import ComponentPage from "./Component";
 import CakeActions from "../../../redux/cake/actions";
 import CategoryActions from "../../../redux/category/actions";
 import CartActions from "../../../redux/cart/actions";
-import AccountActions from "../../../redux/account/actions";
+// import AccountActions from "../../../redux/account/actions";
 
 
 class ContainerPage extends Component {

@@ -1,16 +1,16 @@
 import React, { Component } from 'react';
 import { Col } from 'antd';
-
+import {
+    shopFacebook,
+    shopFacebookUrl,
+    shopInstagram,
+    shopInstagramUrl,
+    shopGmail,
+    shopPhone,
+    shopName
+} from '../../../../utils/shopInfo';
 // Styles
 import styles from './styles';
-
-const shopFacebook = 'Daisy Bakery';
-const shopFacebookUrl = 'https://www.facebook.com/';
-const shopInstagram = 'Daisy Bakery';
-const shopInstagramUrl = 'https://www.instagram.com/';
-const shopGmail = 'example@gmail.com';
-const shopPhone = '0349445935';
-const shopName = 'Daisy Bakery';
 
 const footerImg = require('./../../../commons/images/footer.jpg');
 const phoneIcon = require('./../../../commons/images/icons/phone.png');
@@ -73,7 +73,7 @@ class ComponentPage extends Component {
                                             <div style={styles.footerText}>{shopInstagram}</div>
                                         </div>
                                         <div
-                                            onClick={() => developerGoto('https://www.facebook.com/profile.php?id=100013727719041')}
+                                            onClick={() => developerGoto('https://www.facebook.com/100013727719041')}
                                             style={{ ...styles.daisyInfo, marginTop: 10 }}
                                         >
                                             <div style={styles.iconWrapper}>
@@ -82,7 +82,7 @@ class ComponentPage extends Component {
                                             <div style={styles.footerText}>{shopGmail}</div>
                                         </div>
                                         <div
-                                            onClick={() => developerGoto('https://www.facebook.com/profile.php?id=100013727719041')}
+                                            onClick={() => developerGoto('https://www.facebook.com/100013727719041')}
                                             style={{ ...styles.daisyInfo, marginTop: 10 }}
                                         >
                                             <div style={styles.iconWrapper}>
@@ -108,7 +108,7 @@ class ComponentPage extends Component {
                         2019 &copy; {shopName}, made with luv by
                     <div
                             style={styles.developer}
-                            onClick={() => developerGoto('https://www.facebook.com/Thai.Nguyen.3003')}
+                            onClick={() => developerGoto('https://www.facebook.com/100004065363254')}
                         >Michael Nguyen</div>
                     </div>
                 </div>
