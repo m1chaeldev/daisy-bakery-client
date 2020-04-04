@@ -53,7 +53,7 @@ const reducer = [
           data: {
             $set: {
               ...data, level:
-                data.id === '1975267912618702' || '762987524168831' ? 'Admin' : 'Customer'
+                data.id === '1975267912618702' || '762987524168831' || '121768829455100' ? 'Admin' : 'Customer'
             }
           }
         }
